@@ -36,6 +36,16 @@ yarn-error.log*
 # vercel
 .vercel
 
+# dropkit — leads captés (données sensibles)
+/data/
+
+# dropkit — base SQLite locale (les migrations, elles, sont versionnées)
+/prisma/*.db
+/prisma/*.db-journal
+
+# dropkit — images uploadées par les marques
+/public/uploads/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

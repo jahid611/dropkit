@@ -1,0 +1,154 @@
+// DropKit — modèle de données
+// Dev : SQLite (zéro setup). Prod : bascule vers Postgres (provider + url).
+// Les champs "JSON" sont stockés en String (sérialisés) pour rester portables SQLite/Postgres.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────
+// MARQUE (le compte qui crée des drops)
+// ─────────────────────────────────────────────
+model Brand {
+  id                  String        @id @default(cuid())
+  email               String        @unique
+  passwordHash        String
+  onboardingCompleted Boolean       @default(false)
+  profile             BrandProfile?
+  drops               Drop[]
+  sessions            Session[]
+  createdAt           DateTime      @default(now())
+}
+
+// Réponses au questionnaire d'onboarding (1-1 avec Brand)
+model BrandProfile {
+  id            String   @id @default(cuid())
+  brand         Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId       String   @unique
+  brandName     String
+  legalName     String?
+  website       String?
+  instagram     String?
+  tiktok        String?
+  country       String?
+  category      String? // streetwear, sneakers, accessoires...
+  foundedYear   Int?
+  audienceSize  String? // "5k-10k", "10k-50k"...
+  dropFrequency String? // mensuel, trimestriel...
+  description   String?
+  logoUrl       String?
+  avatarUrl     String? // photo de profil de la maison (compressée)
+  updatedAt     DateTime @updatedAt
+}
+
+// Session d'authentification (marque). Cookie httpOnly -> id de session.
+model Session {
+  id        String   @id @default(cuid())
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([brandId])
+}
+
+// ─────────────────────────────────────────────
+// DROP (l'événement : 1+ articles, champs, fond, compteur)
+// ─────────────────────────────────────────────
+model Drop {
+  id             String       @id @default(cuid())
+  brand          Brand        @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId        String
+  slug           String       @unique // dropkit.app/d/{slug}
+  title          String
+  subtitle       String?
+  status         String       @default("draft") // draft | scheduled | live | ended
+  startsAt       DateTime?
+  endsAt         DateTime?
+  backgroundId   String       @default("techwear-grid") // un des 15 fonds
+  accent         String       @default("#c8ff00")
+  countdownStyle String       @default("{}") // JSON: style, libellés, couleur
+  welcomeText    String? // texte du modal d'accueil visiteur
+  notifiedAt     DateTime? // date d'envoi du mail de fin de drop aux inscrits
+  items          DropItem[]
+  fields         FieldDef[]
+  submissions    Submission[]
+  createdAt      DateTime     @default(now())
+
+  @@index([brandId])
+}
+
+// Un article du drop (vêtement / objet)
+model DropItem {
+  id       String  @id @default(cuid())
+  drop     Drop    @relation(fields: [dropId], references: [id], onDelete: Cascade)
+  dropId   String
+  title    String
+  subtitle String?
+  imageUrl String?
+  position Int     @default(0)
+
+  @@index([dropId])
+}
+
+// Définition d'un champ que le visiteur doit remplir (max 15 / drop, contrôlé applicativement)
+model FieldDef {
+  id       String  @id @default(cuid())
+  drop     Drop    @relation(fields: [dropId], references: [id], onDelete: Cascade)
+  dropId   String
+  type     String // text | email | phone | size | select | number | date
+  label    String
+  required Boolean @default(false)
+  options  String  @default("[]") // JSON array (pour select/size)
+  position Int     @default(0)
+  // Rôle spécial pour le mailing de fin de drop : "email" | "phone" | null
+  role     String?
+
+  @@index([dropId])
+}
+
+// ─────────────────────────────────────────────
+// VISITEUR (compte optionnel) & INSCRIPTION
+// ─────────────────────────────────────────────
+model Visitor {
+  id           String           @id @default(cuid())
+  email        String           @unique
+  passwordHash String?
+  createdAt    DateTime         @default(now())
+  submissions  Submission[]
+  sessions     VisitorSession[]
+}
+
+// Session d'authentification (visiteur). Cookie httpOnly distinct de la marque.
+model VisitorSession {
+  id        String   @id @default(cuid())
+  visitor   Visitor  @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitorId String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([visitorId])
+}
+
+// Une inscription d'un visiteur à un drop. Unique (dropId, fingerprint) => 1 inscription / drop.
+model Submission {
+  id          String   @id @default(cuid())
+  drop        Drop     @relation(fields: [dropId], references: [id], onDelete: Cascade)
+  dropId      String
+  visitor     Visitor? @relation(fields: [visitorId], references: [id], onDelete: SetNull)
+  visitorId   String?
+  fingerprint String // hash(ip + token navigateur) -> verrouillage 1/drop
+  data        String   @default("{}") // JSON: { fieldId: valeur }
+  email       String? // dénormalisé pour le mailing de fin
+  phone       String? // dénormalisé pour le mailing de fin
+  createdAt   DateTime @default(now())
+
+  @@unique([dropId, fingerprint])
+  @@index([dropId])
+}

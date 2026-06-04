@@ -1,26 +1,296 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette "monochrome industriel" (façon Sunmetalon) */
+  --paper: #f6f6f4; /* blanc cassé neutre */
+  --paper-deep: #ececea; /* panneau gris clair */
+  --ink: #111113; /* charbon */
+  --line: rgba(17, 17, 19, 0.12); /* filets / bordures */
+  --steel: #8a8f98; /* gris acier */
+  --accent: #111113; /* monochrome strict : l'accent app = encre */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-line: var(--line);
+  --color-steel: var(--steel);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Titres éditoriaux */
+.font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+/* Titres couture (home maison de luxe) */
+.luxe {
+  font-family: var(--font-luxe), "Times New Roman", serif;
+}
+
+/* Petit label façon magazine : sans, majuscules, interlettrage large */
+.eyebrow {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.62rem;
+  font-weight: 500;
+}
+
+/* Titres "display" — sans géométrique, serré (façon Sunmetalon) */
+.display {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+
+/* ---------- Textures douces (lumière studio) ---------- */
+
+/* Grain papier très subtil */
+.fx-paper-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+}
+
+/* Vignette douce */
+.fx-vignette {
+  background: radial-gradient(
+    ellipse 90% 90% at 50% 35%,
+    transparent 55%,
+    rgba(28, 26, 23, 0.08)
+  );
+}
+
+/* Halo de lumière chaud, lent */
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.06);
+  }
+}
+.fx-soft-glow {
+  background: radial-gradient(
+    circle at 50% 40%,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    transparent 60%
+  );
+  filter: blur(50px);
+  animation: breathe 9s ease-in-out infinite;
+}
+
+/* ---------- Animations des fonds éditoriaux ---------- */
+
+/* Aquarelle / dégradés organiques flottants */
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(4%, -3%) scale(1.08);
+  }
+  66% {
+    transform: translate(-3%, 3%) scale(0.96);
+  }
+}
+.fx-drift {
+  animation: drift 20s ease-in-out infinite;
+}
+
+@keyframes drift-slow {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-4%, 4%);
+  }
+}
+.fx-drift-slow {
+  animation: drift-slow 26s ease-in-out infinite;
+}
+
+/* Rotation très lente (marbre, champagne) */
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fx-turn {
+  animation: turn 60s linear infinite;
+}
+
+/* Filets éditoriaux qui s'étendent */
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+/* ============================================================
+   THÈME "MAISON" (crème) pour le chrome de l'app (dashboard, onboarding…)
+   Redéfinit les tokens -> tous les composants basculent d'un coup.
+   ============================================================ */
+.app-shell {
+  --paper: #f5f1ea; /* fond crème (identique à la home) */
+  --paper-deep: #ece6da; /* panneaux */
+  --ink: #1a1611; /* encre chaude */
+  --line: rgba(26, 22, 17, 0.14); /* filets */
+  --accent: #1a1611; /* monochrome encre */
+  background: #f5f1ea;
+  color: var(--ink);
+}
+.app-shell option {
+  background: #f5f1ea;
+  color: #1a1611;
+}
+
+/* ============================================================
+   LANDING "SaaS moderne" — dark + violet (page d'accueil)
+   ============================================================ */
+
+.lp {
+  --bg: #08080c;
+  --violet: #7c5cff;
+  --violet-2: #a855f7;
+  --indigo: #5b5bff;
+  background: var(--bg);
+  color: #fff;
+}
+
+/* Dégradé de texte blanc -> violet */
+.lp-grad-text {
+  background: linear-gradient(180deg, #ffffff 0%, #d6ccff 55%, #9a86ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Grand halo violet */
+.lp-glow {
+  background: radial-gradient(
+    closest-side,
+    rgba(124, 92, 255, 0.55),
+    rgba(124, 92, 255, 0)
+  );
+  filter: blur(10px);
+}
+
+/* Bande dégradée façon "horizon" */
+.lp-horizon {
+  background: linear-gradient(
+    180deg,
+    rgba(124, 92, 255, 0) 0%,
+    rgba(124, 92, 255, 0.35) 40%,
+    rgba(168, 85, 247, 0.65) 70%,
+    rgba(91, 91, 255, 0.45) 100%
+  );
+}
+
+/* Grille de points */
+.lp-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+}
+
+/* Quadrillage fin */
+.lp-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Verre dépoli */
+.lp-glass {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+.animate-floaty {
+  animation: floaty 8s ease-in-out infinite;
+}
+
+@keyframes ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-ring {
+  animation: ring-spin 28s linear infinite;
+}
+
+@keyframes glowpulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.animate-glowpulse {
+  animation: glowpulse 5s ease-in-out infinite;
+}
+
+/* ---------- Impression : ne garder que le QR ---------- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .qr-printable,
+  .qr-printable * {
+    visibility: visible;
+  }
+  .qr-printable {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: fit-content;
+    height: fit-content;
+    border: none;
+  }
+  .qr-noprint {
+    display: none !important;
+  }
 }
