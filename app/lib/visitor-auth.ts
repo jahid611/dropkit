@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { prisma } from "./db";
 
@@ -22,8 +23,8 @@ export async function createVisitorSession(visitorId: string) {
   });
 }
 
-/** Visiteur connecté, ou null. */
-export async function getCurrentVisitor() {
+/** Visiteur connecté, ou null. Mémoïsé par requête (React cache). */
+export const getCurrentVisitor = cache(async () => {
   const store = await cookies();
   const sid = store.get(COOKIE)?.value;
   if (!sid) return null;
@@ -38,7 +39,7 @@ export async function getCurrentVisitor() {
     return null;
   }
   return session.visitor;
-}
+});
 
 export async function destroyVisitorSession() {
   const store = await cookies();

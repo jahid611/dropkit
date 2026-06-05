@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
@@ -32,8 +33,12 @@ export async function createSession(brandId: string) {
   });
 }
 
-/** Marque actuellement connectée (avec son profil), ou null. */
-export async function getCurrentBrand() {
+/**
+ * Marque actuellement connectée (avec son profil), ou null.
+ * Mémoïsée par requête (React cache) : le layout et la page partagent une seule
+ * requête DB de session au lieu de la rejouer à chaque appel d'une même navigation.
+ */
+export const getCurrentBrand = cache(async () => {
   const store = await cookies();
   const sid = store.get(COOKIE)?.value;
   if (!sid) return null;
@@ -49,7 +54,7 @@ export async function getCurrentBrand() {
     return null;
   }
   return session.brand;
-}
+});
 
 /** Détruit la session courante (DB + cookie). */
 export async function destroySession() {

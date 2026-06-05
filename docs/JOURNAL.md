@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-06-05 (suite 3) — Navigation dashboard + LCP
+
+**Signalé** : LCP ~2,88 s et navigation dashboard (inscrits → dashboard) « ultra lente ».
+
+**Cause** : session relue 2×/navigation (layout + page) + aucune UI de chargement.
+
+**Fait** ([ADR-0004](./decisions/0004-perf-navigation-dashboard.md))
+- `getCurrentBrand` / `getCurrentVisitor` enveloppés dans **`cache()` React** :
+  1 requête DB de session partagée par navigation au lieu de 2.
+- **`app/dashboard/(main)/loading.tsx`** : squelette instantané → navigation perçue immédiate.
+- Polices : les 4 sont réellement utilisées (Geist Mono, Fraunces inclus) → non retirées
+  (gain LCP marginal avec `display:swap`, risque design). Levier LCP réel = TTFB dynamique.
+- `npm run build` ✅ vert.
+
+**Note** : dashboard authentifié non mesurable au curl (redirige sans session) ;
+vérif côté navigation utilisateur.
+
+**Prochaine étape** : pousser + déployer ; l'utilisateur ressent la navigation. Si LCP
+home reste élevé, instrumenter Lighthouse sur `/` précisément.
+
+---
+
 ## 2026-06-05 (suite 2) — Cold start : pages de drop cachées (CDN/ISR)
 
 **Fait** ([ADR-0003](./decisions/0003-cache-pages-de-drop.md))
