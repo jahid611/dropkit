@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-06 — Fix : le slug du drop ne reflétait pas le nom (oubli)
+
+**Signalé (utilisateur)** : un drop créé pointe sur `/d/nouveau-drop` ; crainte que
+deux drops du même nom partagent la même URL.
+
+**Diagnostic** :
+- L'unicité était **déjà garantie** (`uniqueSlug` ajoute `-2`, `-3`… → jamais d'écrasement,
+  unicité globale). Donc pas de collision possible.
+- **Vrai bug** : `saveDropAction` mettait à jour le titre mais **jamais le slug** →
+  il restait figé sur le `nouveau-drop` du brouillon. Indice d'oubli : le paramètre
+  `excludeId` de `uniqueSlug` (utile seulement en update) n'était jamais utilisé.
+
+**Fait** :
+- `saveDropAction` : régénère le slug depuis le titre **tant que le slug est encore
+  le placeholder du brouillon** (`/^nouveau-drop(-\d+)?$/`). Dès qu'un vrai slug existe,
+  il est **figé** (ne pas casser QR codes / liens partagés). Revalidation de l'ancienne
+  ET de la nouvelle URL `/d/...`.
+- `DropEditor` : affiche l'URL réelle après save (`Enregistré ✓ — /d/<slug>`) et met à
+  jour le lien « Voir la page ↗ ».
+- `npm run build` ✅ vert.
+
+**Pour l'utilisateur** : ouvrir le drop existant, vérifier le titre, **Enregistrer** →
+l'URL devient `/d/<vrai-nom>` ; puis régénérer le QR. (Migration auto au prochain save ;
+DB non touchée à la main — ports PG bloqués en local.)
+
+**Piste future** (si besoin de contrôle total) : champ slug éditable dans l'éditeur
+avec validation d'unicité en direct.
+
+---
+
 ## 2026-06-05 (suite 8) — SEO + OpenGraph de la page de drop (Phase 2)
 
 **Demande** : case Phase 2 « SEO de base + OpenGraph (partage de la page de drop) ».

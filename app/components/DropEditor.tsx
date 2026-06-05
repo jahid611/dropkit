@@ -66,6 +66,7 @@ export default function DropEditor({ drop }: { drop: EditorDrop }) {
   const [items, setItems] = useState<ItemState[]>(drop.items);
   const [fields, setFields] = useState<FieldState[]>(drop.fields);
 
+  const [slug, setSlug] = useState(drop.slug);
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -85,11 +86,14 @@ export default function DropEditor({ drop }: { drop: EditorDrop }) {
     };
     startTransition(async () => {
       const res = await saveDropAction(drop.id, payload);
-      setMsg(
-        res.ok
-          ? { ok: true, text: "Enregistré ✓" }
-          : { ok: false, text: res.error ?? "Erreur" },
-      );
+      if (res.ok) {
+        // Le slug peut avoir été dérivé du titre (brouillon) → URL mise à jour.
+        const changed = Boolean(res.slug && res.slug !== slug);
+        if (res.slug) setSlug(res.slug);
+        setMsg({ ok: true, text: changed ? `Enregistré ✓ — /d/${res.slug}` : "Enregistré ✓" });
+      } else {
+        setMsg({ ok: false, text: res.error ?? "Erreur" });
+      }
     });
   }
 
@@ -141,7 +145,7 @@ export default function DropEditor({ drop }: { drop: EditorDrop }) {
             </span>
           )}
           <Link
-            href={`/d/${drop.slug}`}
+            href={`/d/${slug}`}
             target="_blank"
             className="rounded-sm border border-line px-4 py-2 eyebrow text-ink/55 transition hover:border-ink hover:text-ink"
           >

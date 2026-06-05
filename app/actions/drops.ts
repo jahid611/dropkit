@@ -78,6 +78,17 @@ export async function saveDropAction(
   if (!isValidBackground(input.backgroundId))
     return { ok: false, error: "Fond invalide." };
 
+  // Slug : tant que le drop porte encore le slug auto du brouillon
+  // (« nouveau-drop » / « nouveau-drop-N »), on le régénère depuis le vrai titre
+  // pour que l'URL reflète le nom. Dès qu'un vrai slug existe, on le FIGE : le
+  // changer casserait les QR codes et liens déjà partagés. `uniqueSlug` garantit
+  // l'unicité globale (suffixe -2, -3… en cas de collision).
+  let slug = drop.slug;
+  const hasPlaceholderSlug = /^nouveau-drop(-\d+)?$/.test(drop.slug);
+  if (hasPlaceholderSlug && title !== "Nouveau drop") {
+    slug = await uniqueSlug(title, dropId);
+  }
+
   const fields = input.fields.filter((f) => f.label.trim());
   if (fields.length > MAX_FIELDS)
     return { ok: false, error: `${MAX_FIELDS} champs maximum.` };
@@ -98,6 +109,7 @@ export async function saveDropAction(
       where: { id: dropId },
       data: {
         title,
+        slug,
         subtitle: input.subtitle?.trim() || null,
         accent: input.accent,
         backgroundId: input.backgroundId,
@@ -129,8 +141,9 @@ export async function saveDropAction(
 
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/drops/${dropId}`);
-  revalidatePath(`/d/${drop.slug}`); // rafraîchit la page publique cachée
-  return { ok: true, slug: drop.slug };
+  revalidatePath(`/d/${slug}`); // rafraîchit la page publique cachée
+  if (slug !== drop.slug) revalidatePath(`/d/${drop.slug}`); // purge l'ancienne URL
+  return { ok: true, slug };
 }
 
 /** Supprime un drop (cascade : articles, champs, inscriptions). */
