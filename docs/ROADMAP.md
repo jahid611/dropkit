@@ -19,7 +19,7 @@ Légende : `[ ]` à faire · `[~]` en cours · `[x]` fait · `→` voir détail
 - [x] `next.config.ts` : optimisation d'images, formats AVIF/WebP, cache long
 - [x] Fusionner les requêtes DB de `/d/[slug]` (3 lectures séquentielles → `Promise.all`)
 - [ ] Réduire le coût du cold start Prisma (pooling vérifié, init allégée)
-- [ ] Corriger le lien démo cassé (`/d/demo` → 404) : seed d'un drop démo
+- [x] Corriger le lien démo cassé (`/d/demo` → 404) : seed d'un drop démo (`npm run seed:demo`, via REST Supabase)
 - [ ] Audit fonts (4 Google fonts chargées — en garder le strict nécessaire)
 - [~] Mesure avant/après consignée dans PERFORMANCE.md (après = post-déploiement)
 

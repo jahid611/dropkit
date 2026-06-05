@@ -37,8 +37,16 @@
 | 2026-06-05 | Home en `next/image` (hero + carousel) + `next.config` AVIF/WebP | hero JPEG 552 Ko brut | optimisé/resizé en prod (à mesurer Lighthouse post-deploy) |
 | 2026-06-05 | `/d/[slug]` : 3 lectures séquentielles → `Promise.all` | drop + visitor + token en série | 1 aller-retour parallèle |
 
+| 2026-06-05 | Seed du drop `/d/demo` (lien vitrine réparé) | 404 | 200 (TTFB 3,7 s froid / 1,4 s chaud) |
+
 > **Reste à mesurer après déploiement** (l'optimisation `next/image` n'agit qu'en prod) :
 > LCP de `/` via Lighthouse, et TTFB chaud de `/d/<slug>`.
+
+### ⏭️ Prochain chantier : le cold start (gain ressenti #1)
+`/d/demo` à 3,7 s à froid le confirme. Pistes à instruire :
+- Vérifier que `DATABASE_URL` pointe bien le pooler pgbouncer (6543) et `DIRECT_URL` le direct (5432).
+- Réduire l'init Prisma au démarrage de la lambda (imports, taille du bundle serveur).
+- Évaluer Fluid Compute / réduction du nombre de fonctions, ou un cache court sur les pages de drop.
 
 ## Méthode de mesure (reproductible)
 
