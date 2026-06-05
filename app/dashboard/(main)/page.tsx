@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireOnboardedBrand } from "@/app/lib/guard";
 import { prisma } from "@/app/lib/db";
 import { createDraftDropAction, deleteDropAction } from "@/app/actions/drops";
+import { dropPath } from "@/app/lib/drop-url";
 
 function statusLabel(starts: Date | null, ends: Date | null) {
   const now = Date.now();
@@ -13,6 +14,7 @@ function statusLabel(starts: Date | null, ends: Date | null) {
 
 export default async function DashboardPage() {
   const brand = await requireOnboardedBrand();
+  const brandName = brand.profile?.brandName;
   const drops = await prisma.drop.findMany({
     where: { brandId: brand.id },
     orderBy: { createdAt: "desc" },
@@ -84,13 +86,13 @@ export default async function DashboardPage() {
                     <span className={`eyebrow ${st.cls}`}>{st.text}</span>
                   </div>
                   <p className="mt-0.5 text-xs text-ink/40">
-                    /d/{d.slug} · {d._count.submissions} inscrit
+                    {dropPath(brandName, d.slug)} · {d._count.submissions} inscrit
                     {d._count.submissions > 1 ? "s" : ""}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <Link
-                    href={`/d/${d.slug}`}
+                    href={dropPath(brandName, d.slug)}
                     target="_blank"
                     className="border border-line px-3 py-1.5 eyebrow text-ink/55 transition hover:border-ink hover:text-ink"
                   >

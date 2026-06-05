@@ -6,6 +6,7 @@ import { notifyRegistrantsAction } from "@/app/actions/notify";
 export interface DropStats {
   id: string;
   slug: string;
+  path: string;
   title: string;
   count: number;
   emailable: number;
@@ -85,7 +86,7 @@ export default function InscritsAccordion({ drops }: { drops: DropStats[] }) {
                   {d.count} inscrit{d.count > 1 ? "s" : ""}
                 </span>
               </div>
-              <span className="eyebrow text-ink/35">/d/{d.slug}</span>
+              <span className="eyebrow text-ink/35">{d.path}</span>
             </button>
 
             {open && (

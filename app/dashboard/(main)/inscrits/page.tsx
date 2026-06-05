@@ -1,5 +1,6 @@
 import { requireOnboardedBrand } from "@/app/lib/guard";
 import { prisma } from "@/app/lib/db";
+import { dropPath } from "@/app/lib/drop-url";
 import InscritsAccordion, {
   type DropStats,
 } from "@/app/components/InscritsAccordion";
@@ -27,6 +28,7 @@ export default async function InscritsPage() {
   const stats: DropStats[] = drops.map((d) => ({
     id: d.id,
     slug: d.slug,
+    path: dropPath(brand.profile?.brandName, d.slug),
     title: d.title,
     count: d.submissions.length,
     emailable: d.submissions.filter((s) => s.email).length,

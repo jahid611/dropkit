@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/db";
 import { requireOnboardedBrand } from "@/app/lib/guard";
+import { dropPath } from "@/app/lib/drop-url";
 import { sendDropNotification } from "@/app/lib/email";
 
 export interface NotifyActionResult {
@@ -39,7 +40,7 @@ export async function notifyRegistrantsAction(
   const h = await headers();
   const host = h.get("host") ?? "localhost:3000";
   const proto = host.includes("localhost") ? "http" : "https";
-  const dropUrl = `${proto}://${host}/d/${drop.slug}`;
+  const dropUrl = `${proto}://${host}${dropPath(brand.profile?.brandName, drop.slug)}`;
 
   const res = await sendDropNotification({
     to: emails,

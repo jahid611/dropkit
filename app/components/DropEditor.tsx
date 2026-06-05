@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { saveDropAction, type DropInput } from "@/app/actions/drops";
 import { FIELD_TYPES, MAX_FIELDS, ROLE_OPTIONS } from "@/app/lib/fields";
+import { dropPath } from "@/app/lib/drop-url";
 import BackgroundPicker from "./BackgroundPicker";
 import ImageUpload from "./ImageUpload";
 import DropPreview from "./DropPreview";
@@ -90,7 +91,12 @@ export default function DropEditor({ drop }: { drop: EditorDrop }) {
         // Le slug peut avoir été dérivé du titre (brouillon) → URL mise à jour.
         const changed = Boolean(res.slug && res.slug !== slug);
         if (res.slug) setSlug(res.slug);
-        setMsg({ ok: true, text: changed ? `Enregistré ✓ — /d/${res.slug}` : "Enregistré ✓" });
+        setMsg({
+          ok: true,
+          text: changed
+            ? `Enregistré ✓ — ${dropPath(drop.brandName, res.slug!)}`
+            : "Enregistré ✓",
+        });
       } else {
         setMsg({ ok: false, text: res.error ?? "Erreur" });
       }
@@ -145,7 +151,7 @@ export default function DropEditor({ drop }: { drop: EditorDrop }) {
             </span>
           )}
           <Link
-            href={`/d/${slug}`}
+            href={dropPath(drop.brandName, slug)}
             target="_blank"
             className="rounded-sm border border-line px-4 py-2 eyebrow text-ink/55 transition hover:border-ink hover:text-ink"
           >

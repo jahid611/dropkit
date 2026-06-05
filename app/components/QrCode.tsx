@@ -12,11 +12,11 @@ interface Design {
 }
 
 export default function QrCode({
-  slug,
+  path,
   accent,
   filename = "dropkit-qr",
 }: {
-  slug: string;
+  path: string;
   accent: string;
   filename?: string;
 }) {
@@ -54,7 +54,7 @@ export default function QrCode({
   }
 
   useEffect(() => {
-    const fullUrl = `${window.location.origin}/d/${slug}`;
+    const fullUrl = `${window.location.origin}${path}`;
     setUrl(fullUrl);
     let cancelled = false;
 
@@ -76,7 +76,7 @@ export default function QrCode({
     return () => {
       cancelled = true;
     };
-  }, [slug, designIdx, designs]);
+  }, [path, designIdx, designs]);
 
   async function print() {
     if (!qrRef.current) return;
@@ -85,7 +85,7 @@ export default function QrCode({
     const w = window.open("", "_blank", "width=420,height=520");
     if (!w) return;
     w.document.write(
-      `<!doctype html><title>QR — ${slug}</title>` +
+      `<!doctype html><title>QR — ${url}</title>` +
         `<body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#fff">` +
         `<img src="${objUrl}" style="width:340px;height:340px" onload="window.focus();window.print();">` +
         `</body>`,

@@ -7,6 +7,7 @@ import { requireOnboardedBrand } from "@/app/lib/guard";
 import { slugify } from "@/app/lib/slug";
 import { isValidBackground, DEFAULT_BACKGROUND } from "@/app/lib/backgrounds";
 import { FIELD_TYPE_SET, MAX_FIELDS } from "@/app/lib/fields";
+import { dropPath } from "@/app/lib/drop-url";
 
 export interface ItemInput {
   title: string;
@@ -139,10 +140,11 @@ export async function saveDropAction(
     }),
   ]);
 
+  const brandName = brand.profile?.brandName;
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/drops/${dropId}`);
-  revalidatePath(`/d/${slug}`); // rafraîchit la page publique cachée
-  if (slug !== drop.slug) revalidatePath(`/d/${drop.slug}`); // purge l'ancienne URL
+  revalidatePath(dropPath(brandName, slug)); // rafraîchit la page publique cachée
+  if (slug !== drop.slug) revalidatePath(dropPath(brandName, drop.slug)); // purge l'ancienne URL
   return { ok: true, slug };
 }
 

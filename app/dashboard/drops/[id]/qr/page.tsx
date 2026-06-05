@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireOnboardedBrand } from "@/app/lib/guard";
 import { prisma } from "@/app/lib/db";
 import { slugify } from "@/app/lib/slug";
+import { dropPath } from "@/app/lib/drop-url";
 import QrCode from "@/app/components/QrCode";
 
 export default async function DropQrPage({
@@ -39,7 +40,7 @@ export default async function DropQrPage({
       </div>
 
       <QrCode
-        slug={drop.slug}
+        path={dropPath(brand.profile?.brandName, drop.slug)}
         accent={drop.accent}
         filename={`drop-${slugify(drop.title)}-qr`}
       />

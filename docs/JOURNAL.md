@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-06 (suite) — Nom de la maison dans l'URL : /d/<maison>/<drop>
+
+**Demande (utilisateur)** : faire apparaître le nom de la maison dans l'URL, en plus
+du drop. Format choisi : **imbriqué** `/d/maison/drop` (le plus lisible).
+
+**Contrainte Next** : deux segments dynamiques au même niveau doivent porter le même
+nom → impossible d'avoir `[slug]` et `[brand]` voisins. Structure retenue :
+- `app/d/[brand]/[slug]/page.tsx` — la vraie page (`slug` = slug du drop, clé de lecture ;
+  `brand` décoratif). **Reste statique/ISR** (CDN, perf préservée). `generateMetadata`
+  canonical = `/d/<maison>/<drop>`.
+- `app/d/[brand]/page.tsx` — compat : ancien `/d/<drop>` (1 segment) → **redirige** vers
+  le canonique (préserve QR/liens déjà partagés + lien démo de la home). Dynamique.
+
+**Centralisation** : `app/lib/drop-url.ts` (`brandSlug`, `dropPath`) — **toutes** les
+constructions d'URL passent par là : liens dashboard, « Voir la page » + message de
+l'éditeur, QR (`QrCode` prend désormais un `path` complet), OpenGraph, emails Resend,
+`revalidatePath`. Le slug de maison est dérivé du nom (pas de migration DB).
+
+**Vérifié** : `npm run build` ✅ ; table de routes = `ƒ /d/[brand]` + `○ /d/[brand]/[slug]`
+(page toujours statique). Pages DB non testables en local (ports PG) → valider en prod :
+`/d/<maison>/<drop>` s'affiche, et un ancien `/d/<drop>` redirige.
+
+**Note** : si deux maisons ont le même nom, le segment maison est identique mais le slug
+de drop (unique global) départage — pas de collision. Préfixe maison erroné = même page,
+dédoublonnée par le `canonical`.
+
+---
+
 ## 2026-06-06 — Fix : le slug du drop ne reflétait pas le nom (oubli)
 
 **Signalé (utilisateur)** : un drop créé pointe sur `/d/nouveau-drop` ; crainte que

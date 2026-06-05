@@ -19,7 +19,10 @@
 
 ```
 /                       Landing publique (statique, rapide)
-/d/[slug]               Page publique d'un drop (DB) — l'expérience visiteur
+/d/[brand]/[slug]       Page publique d'un drop (DB) — l'expérience visiteur.
+                        URL = /d/<maison>/<drop>. <maison> décoratif (slug du nom),
+                        la clé reste <drop> (slug unique global). Statique/ISR (CDN).
+/d/[brand]              Compat : ancien /d/<drop> à 1 segment → redirige vers le canonique
 /login /signup          Auth marque                      (groupe (auth))
 /onboarding             Questionnaire 1ère connexion marque
 /dashboard              Espace marque (drops, inscrits, profil, réglages)
@@ -53,9 +56,13 @@ Champs « JSON » stockés en `String` sérialisé (portabilité). Schéma compl
 - **Prisma en singleton** (`app/lib/db.ts`) pour éviter N connexions en dev.
 - **Garde d'accès** : `requireBrand()` / `requireOnboardedBrand()` en tête des pages dashboard.
 - **Verrouillage 1 inscription / drop** via `@@unique([dropId, fingerprint])`.
-- **SEO / partage** : `generateMetadata` sur `/d/[slug]` (OpenGraph + Twitter, image =
-  1er article ou logo, canonical). URL de base via `app/lib/site.ts` (`siteUrl()` →
-  `metadataBase`). Lecture du drop mutualisée par `app/lib/public-drop.ts` (`cache()`).
+- **URL des drops** : `/d/<maison>/<drop>` construite **uniquement** via
+  `app/lib/drop-url.ts` (`dropPath`) — liens, QR, OpenGraph, emails, revalidation.
+  `<maison>` est le slug du nom (décoratif, pas de colonne) ; `<drop>` est la clé.
+- **SEO / partage** : `generateMetadata` sur `/d/[brand]/[slug]` (OpenGraph + Twitter,
+  image = 1er article ou logo, canonical = `dropPath`). URL de base via `app/lib/site.ts`
+  (`siteUrl()` → `metadataBase`). Lecture du drop mutualisée par `app/lib/public-drop.ts`
+  (`cache()`).
 - Commentaires et libellés produit en **français**.
 
 ## Frontières & dépendances externes

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBackground } from "@/app/lib/backgrounds";
 import { getPublicDrop } from "@/app/lib/public-drop";
+import { dropPath } from "@/app/lib/drop-url";
 import VisitorExperience, {
   type VisitorDrop,
 } from "@/app/components/VisitorExperience";
@@ -11,6 +12,10 @@ import VisitorExperience, {
 // La personnalisation (« déjà inscrit ? ») est récupérée côté client via
 // /api/drops/[id]/me. Revalidation instantanée à l'édition : revalidatePath
 // dans saveDropAction ; backstop horaire ci-dessous par sécurité.
+//
+// URL : /d/<maison>/<drop>. Le segment <maison> est décoratif ; la clé de lecture
+// reste le slug du drop (unique globalement). Le lien canonique pointe toujours
+// vers la maison réelle, donc un préfixe erroné ne crée pas de doublon SEO.
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
@@ -28,7 +33,7 @@ function parseOptions(raw: string): string[] {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ brand: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const drop = await getPublicDrop(slug);
@@ -49,7 +54,7 @@ export async function generateMetadata({
     drop.brand.profile?.logoUrl ??
     null;
   const image = candidate && /^https?:\/\//.test(candidate) ? candidate : null;
-  const url = `/d/${drop.slug}`;
+  const url = dropPath(brandName, drop.slug);
 
   return {
     // `absolute` : la page de drop porte l'identité de la marque, pas « · DropKit ».
@@ -76,7 +81,7 @@ export async function generateMetadata({
 export default async function PublicDropPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ brand: string; slug: string }>;
 }) {
   const { slug } = await params;
   const drop = await getPublicDrop(slug);
