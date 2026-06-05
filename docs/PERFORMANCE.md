@@ -26,7 +26,10 @@
    `submission.findFirst`) — sur un chemin déjà pénalisé par le cold start.
    - Levier : fusionner / paralléliser.
 4. **4 Google fonts** chargées (Fraunces, Playfair, Geist, Geist Mono).
-   - Levier : ne garder que celles réellement utilisées au-dessus de la ligne de flottaison.
+   - Audit fait : les 4 servent réellement (Geist=corps, Playfair=titres `.luxe`,
+     Fraunces=hero visiteur, Mono=libellés formulaire). Aucune retirée.
+   - Levier appliqué : périmètre de préchargement. Geist Mono → `preload: false`
+     (jamais au-dessus de la ligne de flottaison) ⇒ home préchargée de 4 → 3 polices.
 
 ## Journal des correctifs
 
@@ -36,6 +39,7 @@
 |---|---|---|---|
 | 2026-06-05 | Home en `next/image` (hero + carousel) + `next.config` AVIF/WebP | hero JPEG 552 Ko brut | optimisé/resizé en prod (à mesurer Lighthouse post-deploy) |
 | 2026-06-05 | `/d/[slug]` : 3 lectures séquentielles → `Promise.all` | drop + visitor + token en série | 1 aller-retour parallèle |
+| 2026-06-05 | Audit fonts : Geist Mono `preload: false` (jamais hero) | 4 polices préchargées / route | 3 préchargées sur la home (build vérifié) |
 
 | 2026-06-05 | Seed du drop `/d/demo` (lien vitrine réparé) | 404 | 200 (TTFB 3,7 s froid / 1,4 s chaud) |
 | 2026-06-05 | `/d/[slug]` passée en **statique/ISR** (CDN), état perso via `/me` ([ADR-0003](./decisions/0003-cache-pages-de-drop.md)) | TTFB **~3,7 s** à froid | TTFB **~65 ms** (CDN HIT) — **≈ 50× plus rapide**, mesuré en prod |

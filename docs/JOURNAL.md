@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-05 (suite 6) — Audit fonts (Phase 1 close)
+
+**Demande** : prochaine case de la roadmap → « Audit fonts (4 Google fonts) ».
+
+**Constat** (confirme la note de la suite 3) : les 4 polices servent réellement —
+Geist (corps `<body>`), Playfair (titres `.luxe` : home + dashboard), Fraunces
+(hero de la page visiteur `/d/[slug]`), Geist Mono (libellés du formulaire visiteur :
+`LeadForm`, `MusicToggle`). **Aucune retirée** — en supprimer casserait le design.
+
+**Levier appliqué** (doc next/font « Preloading » : une police du root layout est
+préchargée sur *toutes* les routes) :
+- **Geist Mono → `preload: false`** : jamais au-dessus de la ligne de flottaison
+  (petits libellés visiteur). La police reste chargée/appliquée, mais sans
+  `<link rel=preload>` sur chaque page.
+- `display: "swap"` rendu explicite sur Geist/Geist Mono (déjà le défaut dans cette
+  version de Next — pour la lisibilité du code).
+
+**Vérifié** : `npm run build` ✅ vert ; HTML prérendu de la home = **3 polices
+préchargées au lieu de 4** (Mono retiré).
+
+**Trade-off assumé** : Fraunces reste préchargée sur la home alors qu'elle n'y sert
+pas (réservée au hero visiteur) — la retirer globalement provoquerait un swap visible
+sur le headline produit. Fix propre = module de polices préchargées **par route**
+(différé : invasif vs gain marginal, et Phase « fiabilité » prioritaire).
+
+**Prochaine étape** : Phase 1 close. Attaquer **Phase 2** — revue UX bout-en-bout
+(signup → onboarding → drop → QR → inscription → export) puis états vides/erreurs.
+
+---
+
 ## 2026-06-05 (suite 5) — Visuel de marque unifié partout
 
 **Demande** : « le logo et la photo de profil doivent devenir la même chose partout ».
