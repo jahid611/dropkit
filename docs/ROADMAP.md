@@ -43,14 +43,15 @@ Légende : `[ ]` à faire · `[~]` en cours · `[x]` fait · `→` voir détail
 - [ ] RGPD : mentions, consentement, suppression de compte effective
 - [ ] Tests des parcours critiques (au moins manuels documentés)
 
-## Phase 4 — Monétisation (déclenchée quand Phases 1-3 OK)  `[ ]`
-> ⚠️ **Parquée.** Détails et décisions ouvertes dans [MONETISATION.md](./MONETISATION.md).
-- [ ] Choix définitif des paliers et des prix (décision produit à venir)
+## Phase 4 — Monétisation (démarrée en surface, paiement non branché)  `[~]`
+> Détails dans [MONETISATION.md](./MONETISATION.md). Amorcée à la demande utilisateur
+> (limites + page tarifs) ; le **paiement reste à brancher** (décision prestataire ouverte).
+- [x] Paliers & prix posés (Découverte gratuit / Studio 29 € / Maison 89 €) — `app/lib/plans.ts`
 - [ ] Choix prestataire paiement (Stripe vs Lemon Squeezy/Paddle)
-- [ ] Modèle de données abonnement sur `Brand` (plan, statut, quotas)
+- [ ] Modèle de données abonnement sur `Brand` (plan, statut, quotas) — _pas de colonne pour l'instant : tout le monde sur Découverte (migration DB à faire en Phase 4)_
 - [ ] Intégration paiement (Checkout + portail client + webhooks)
-- [ ] Application des quotas par plan (limites drops / leads / features)
-- [ ] Page pricing + parcours d'upgrade
+- [x] **Quota appliqué** : création de drops plafonnée par plan (`createDraftDropAction` → `/tarifs?from=quota`)
+- [x] **Page pricing** `/tarifs` (3 plans, bandeau quota) + indicateur d'usage au dashboard. Reste : parcours d'upgrade payant.
 - [ ] Facturation, TVA, factures
 
 ## Phase 5 — Croissance  `[ ]`

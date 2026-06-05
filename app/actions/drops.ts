@@ -8,6 +8,7 @@ import { slugify } from "@/app/lib/slug";
 import { isValidBackground, DEFAULT_BACKGROUND } from "@/app/lib/backgrounds";
 import { FIELD_TYPE_SET, MAX_FIELDS } from "@/app/lib/fields";
 import { dropPath } from "@/app/lib/drop-url";
+import { planForBrand } from "@/app/lib/plans";
 
 export interface ItemInput {
   title: string;
@@ -51,6 +52,12 @@ async function uniqueSlug(base: string, excludeId?: string) {
 /** Crée un brouillon et ouvre l'éditeur. */
 export async function createDraftDropAction() {
   const brand = await requireOnboardedBrand();
+
+  // Quota : on ne crée pas de drops à l'infini. Au-delà du plan → page tarifs.
+  const plan = planForBrand(brand);
+  const count = await prisma.drop.count({ where: { brandId: brand.id } });
+  if (count >= plan.maxDrops) redirect("/tarifs?from=quota");
+
   const slug = await uniqueSlug("nouveau-drop");
   const drop = await prisma.drop.create({
     data: {
@@ -149,9 +156,8 @@ export async function saveDropAction(
 }
 
 /** Supprime un drop (cascade : articles, champs, inscriptions). */
-export async function deleteDropAction(formData: FormData) {
+export async function deleteDropAction(dropId: string) {
   const brand = await requireOnboardedBrand();
-  const dropId = String(formData.get("dropId") ?? "");
   await prisma.drop.deleteMany({ where: { id: dropId, brandId: brand.id } });
   revalidatePath("/dashboard");
 }

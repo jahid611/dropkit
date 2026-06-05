@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-06-06 (suite 3) — Modale suppression + copier-lien + quotas + page tarifs
+
+**Demande (utilisateur)** : belle modale de suppression, bouton copier-lien, empêcher la
+création à l'infini (3 plans + page paiement, contenus/limites « comme il faut »).
+
+**Fait** :
+- **`DeleteDropModal`** : « Suppr. » ouvre une modale animée (framer-motion) avec
+  avertissement explicite (`N inscrits` perdus) → confirme → `deleteDropAction`.
+  (Action passée de `FormData` à `(dropId: string)`.)
+- **`CopyLinkButton`** : copie l'URL absolue (`origin + dropPath`) avec retour « Copié ✓ »
+  (repli `execCommand` si pas d'API presse-papier).
+- **Quotas** : `app/lib/plans.ts` (source unique) — 3 plans **Découverte (gratuit, 3 drops)
+  / Studio (29 €, 25) / Maison (89 €, ∞)** + `maxFields`/`maxSubmissionsPerDrop`.
+  `createDraftDropAction` plafonne la création → `/tarifs?from=quota`. Dashboard : bouton
+  « ＋ Nouveau drop » remplacé par « Améliorer mon plan » au plafond + indicateur `X / N drops`.
+- **Page `/tarifs`** (publique, thème crème, 3 colonnes, badge « Recommandé », bandeau
+  quota) + liens « Tarifs » dans l'en-tête et le footer de la landing.
+
+**Contrainte assumée** : pas de migration DB possible ici (ports PG bloqués) → **pas de
+colonne `plan`** ; `planForBrand()` renvoie Découverte pour tous. Paiement non branché
+(monétisation toujours « parquée » côté Stripe). MONETISATION.md & ROADMAP (Phase 4 `[~]`) à jour.
+
+**Vérifié** : `npm run build` ✅. **`/tarifs` testée en local** (pas de DB) → 200, 3 plans
+rendus. Modales + dashboard = DB/auth → à valider en prod.
+
+---
+
 ## 2026-06-06 (suite 2) — Aperçu d'un drop en modale depuis le dashboard
 
 **Demande (utilisateur)** : sur « Mes drops », un bouton « œil » à côté de « Voir » →

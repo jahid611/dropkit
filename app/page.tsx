@@ -28,6 +28,9 @@ export default function Home() {
           DropKit
         </Link>
         <nav className="flex items-center justify-end gap-7">
+          <Link href="/tarifs" className="hidden text-[0.65rem] uppercase tracking-[0.22em] text-[#1a1611]/70 transition hover:text-[#1a1611] sm:inline">
+            Tarifs
+          </Link>
           <Link href="/login" className="text-[0.65rem] uppercase tracking-[0.22em] text-[#1a1611]/70 transition hover:text-[#1a1611]">
             Connexion
           </Link>
@@ -144,6 +147,9 @@ export default function Home() {
                 </Link>
                 <Link href="/login" className="text-sm text-[#1a1611]/70 transition hover:text-[#1a1611]">
                   Connexion
+                </Link>
+                <Link href="/tarifs" className="text-sm text-[#1a1611]/70 transition hover:text-[#1a1611]">
+                  Tarifs
                 </Link>
                 <Link href="/d/demo" className="text-sm text-[#1a1611]/70 transition hover:text-[#1a1611]">
                   Démo

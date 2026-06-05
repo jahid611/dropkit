@@ -1,8 +1,20 @@
-# 💰 Monétisation DropKit — PARQUÉ (Phase 4)
+# 💰 Monétisation DropKit — DÉMARRÉE en surface (Phase 4)
 
-> ⚠️ **Ne pas implémenter maintenant.** Décision utilisateur : on **finit l'app**
-> (Phases 1-3 de la ROADMAP) **avant** de poser les tarifs. Ce fichier conserve la
-> réflexion pour ne pas la reperdre, pas un plan à exécuter aujourd'hui.
+> **État (2026-06-06)** : à la demande utilisateur, on a posé les **paliers** et les
+> **limites appliquées** + une **page tarifs**, mais le **paiement n'est pas branché**
+> (pas de prestataire choisi, pas de Stripe). Tout le monde est donc sur le plan gratuit.
+>
+> **Fait** :
+> - `app/lib/plans.ts` — 3 plans (Découverte gratuit / Studio 29 € / Maison 89 €) + limites
+>   (`maxDrops`, `maxFields`, `maxSubmissionsPerDrop`). Source unique pour quotas + page tarifs.
+> - **Quota drops appliqué** : `createDraftDropAction` bloque au-delà de `plan.maxDrops`
+>   → redirige vers `/tarifs?from=quota`. Indicateur d'usage (`X / N drops`) au dashboard.
+> - **Page `/tarifs`** publique (3 plans, badge « Recommandé », bandeau quota). CTA → /signup.
+>
+> **Reste à faire (vrai Phase 4)** : choisir le prestataire, ajouter `plan`/`subscriptionStatus`
+> sur `Brand` (migration DB), brancher Checkout + webhooks + portail, parcours d'upgrade,
+> appliquer aussi `maxFields`/`maxSubmissionsPerDrop` si voulu. Le seul point à modifier pour
+> activer les plans payants côté quotas = `planForBrand()` dans `app/lib/plans.ts`.
 
 ## Décisions encore ouvertes
 - **Paliers & prix** : non figés. Pistes évoquées :

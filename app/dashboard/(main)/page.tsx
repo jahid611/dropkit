@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { requireOnboardedBrand } from "@/app/lib/guard";
 import { prisma } from "@/app/lib/db";
-import { createDraftDropAction, deleteDropAction } from "@/app/actions/drops";
+import { createDraftDropAction } from "@/app/actions/drops";
 import { dropPath } from "@/app/lib/drop-url";
+import { planForBrand, formatLimit } from "@/app/lib/plans";
 import DropPreviewModal from "@/app/components/DropPreviewModal";
+import CopyLinkButton from "@/app/components/CopyLinkButton";
+import DeleteDropModal from "@/app/components/DeleteDropModal";
 
 function statusLabel(starts: Date | null, ends: Date | null) {
   const now = Date.now();
@@ -22,6 +25,9 @@ export default async function DashboardPage() {
     include: { _count: { select: { submissions: true } } },
   });
 
+  const plan = planForBrand(brand);
+  const atCap = drops.length >= plan.maxDrops;
+
   return (
     <div>
       <div className="flex items-end justify-between border-b border-line pb-6">
@@ -29,11 +35,28 @@ export default async function DashboardPage() {
           <p className="eyebrow text-ink/45">Studio</p>
           <h1 className="mt-2 luxe text-3xl tracking-tight text-ink">Mes drops</h1>
         </div>
-        <form action={createDraftDropAction}>
-          <button className="bg-ink px-5 py-2.5 eyebrow text-paper transition hover:opacity-85">
-            ＋ Nouveau drop
-          </button>
-        </form>
+        <div className="flex flex-col items-end gap-1.5">
+          {atCap ? (
+            <Link
+              href="/tarifs?from=quota"
+              className="bg-accent px-5 py-2.5 eyebrow text-white transition hover:brightness-110"
+            >
+              Améliorer mon plan
+            </Link>
+          ) : (
+            <form action={createDraftDropAction}>
+              <button className="bg-ink px-5 py-2.5 eyebrow text-paper transition hover:opacity-85">
+                ＋ Nouveau drop
+              </button>
+            </form>
+          )}
+          <Link
+            href="/tarifs"
+            className="text-xs text-ink/45 underline-offset-2 transition hover:text-ink hover:underline"
+          >
+            {drops.length} / {formatLimit(plan.maxDrops)} drops · plan {plan.name}
+          </Link>
+        </div>
       </div>
 
       {/* Comment ça marche — pédagogie + densité, visible en permanence */}
@@ -93,6 +116,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <DropPreviewModal path={dropPath(brandName, d.slug)} title={d.title} />
+                  <CopyLinkButton path={dropPath(brandName, d.slug)} />
                   <Link
                     href={dropPath(brandName, d.slug)}
                     target="_blank"
@@ -112,12 +136,11 @@ export default async function DashboardPage() {
                   >
                     Éditer
                   </Link>
-                  <form action={deleteDropAction}>
-                    <input type="hidden" name="dropId" value={d.id} />
-                    <button className="border border-line px-3 py-1.5 eyebrow text-ink/40 transition hover:border-accent hover:text-accent">
-                      Suppr.
-                    </button>
-                  </form>
+                  <DeleteDropModal
+                    dropId={d.id}
+                    title={d.title}
+                    count={d._count.submissions}
+                  />
                 </div>
               </li>
             );
