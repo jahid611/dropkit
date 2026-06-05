@@ -37,7 +37,7 @@ export async function completeOnboardingAction(
     audienceSize: str(formData, "audienceSize"),
     dropFrequency: str(formData, "dropFrequency"),
     website: str(formData, "website"),
-    logoUrl: str(formData, "logoUrl"),
+    avatarUrl: str(formData, "avatarUrl"), // visuel unique de la maison (ex-logoUrl)
     description: str(formData, "description"),
     country: str(formData, "country"),
   };

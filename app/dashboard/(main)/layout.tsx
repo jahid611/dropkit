@@ -12,7 +12,7 @@ export default async function MainLayout({
       <AppHeader
         brandName={brand.profile?.brandName ?? brand.email}
         email={brand.email}
-        avatarUrl={brand.profile?.avatarUrl ?? null}
+        avatarUrl={brand.profile?.avatarUrl ?? brand.profile?.logoUrl ?? null}
       />
       <main className="mx-auto w-[80%] py-10">{children}</main>
     </>

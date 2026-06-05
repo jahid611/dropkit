@@ -82,7 +82,10 @@ export default function OnboardingForm({
   );
   const [step, setStep] = useState(0);
   const [brandName, setBrandName] = useState(defaults.brandName ?? "");
-  const [logoUrl, setLogoUrl] = useState<string | null>(defaults.logoUrl ?? null);
+  // Visuel unique de la maison (logo = photo de profil). Repli sur l'ancien logoUrl.
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(
+    defaults.avatarUrl ?? defaults.logoUrl ?? null,
+  );
 
   const canNext = step !== 0 || brandName.trim().length > 0;
 
@@ -108,8 +111,8 @@ export default function OnboardingForm({
         ))}
       </div>
 
-      {/* Champ caché : l'URL du logo uploadé (étape 3) part avec le formulaire. */}
-      <input type="hidden" name="logoUrl" value={logoUrl ?? ""} />
+      {/* Champ caché : le visuel de la maison (étape 3) part avec le formulaire. */}
+      <input type="hidden" name="avatarUrl" value={avatarUrl ?? ""} />
 
       {/* Aide contextuelle : à quoi sert l'étape courante. */}
       <p className="mb-7 text-sm leading-relaxed text-ink/55">{STEP_HINTS[step]}</p>
@@ -225,15 +228,15 @@ export default function OnboardingForm({
       {/* Étape 3 — Identité */}
       <div className={step === 2 ? "flex flex-col gap-4" : "hidden"}>
         <div className="flex flex-col gap-2">
-          <span className="eyebrow text-ink/45">Logo de la maison</span>
+          <span className="eyebrow text-ink/45">Logo / photo de la maison</span>
           <AvatarUpload
-            value={logoUrl}
-            onChange={setLogoUrl}
+            value={avatarUrl}
+            onChange={setAvatarUrl}
             initial={(brandName?.[0] ?? "?").toUpperCase()}
           />
           <p className="text-xs leading-relaxed text-ink/40">
-            S&apos;affiche sur vos pages de drop et dans votre studio. L&apos;image est
-            redimensionnée et compressée automatiquement — privilégiez un fond neutre.
+            Un seul visuel pour votre maison : il apparaît dans votre studio comme sur vos
+            pages de drop publiques. Redimensionné et compressé automatiquement — fond neutre conseillé.
           </p>
         </div>
         <Field label="Pays">

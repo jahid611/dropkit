@@ -10,6 +10,7 @@ export interface VisitorDrop {
   id: string;
   slug: string;
   brandName: string;
+  logo: string | null;
   title: string;
   subtitle: string | null;
   accent: string;
@@ -82,6 +83,12 @@ export default function VisitorExperience({
       <Background id={drop.backgroundId} accent={drop.accent} />
 
       <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center px-6 py-16 text-center">
+        {drop.logo && (
+          <div className="mb-5 h-16 w-16 overflow-hidden rounded-full border border-line/40">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={drop.logo} alt={drop.brandName} className="h-full w-full object-cover" />
+          </div>
+        )}
         <p className={`eyebrow ${inkSoft}`}>{drop.brandName}</p>
         <h1 className={`mt-4 max-w-2xl font-serif text-[clamp(2.25rem,7vw,4.5rem)] font-light leading-[1.05] tracking-tight ${ink}`}>
           {drop.title}

@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-05 (suite 5) — Visuel de marque unifié partout
+
+**Demande** : « le logo et la photo de profil doivent devenir la même chose partout ».
+
+**Fait** ([ADR-0005](./decisions/0005-visuel-unique-maison.md))
+- Champ canonique unique = **`avatarUrl`**. Onboarding + profil écrivent/lisent ce champ
+  (libellé « Logo / photo de la maison »).
+- Affiché **partout** : header du studio (déjà) **+ pages de drop publiques** (`/d/[slug]`,
+  petit médaillon rond au-dessus du nom de la maison).
+- **Repli `avatarUrl ?? logoUrl`** partout (affichage + pré-remplissage) → anciennes
+  données visibles, auto-migrées à la prochaine sauvegarde. Pas de migration DB.
+- `logoUrl` reste en base (orphelin, source du repli). `npm run build` ✅ vert.
+
+**Prochaine étape** : Phase 2 (revue UX bout-en-bout, SEO/OG des pages de drop).
+
+---
+
 ## 2026-06-05 (suite 4) — Upload logo onboarding + densité éditoriale (Phase 2)
 
 **Demande** : à l'inscription, remplacer le champ « logo URL » par un upload ; ajouter

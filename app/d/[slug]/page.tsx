@@ -49,6 +49,7 @@ export default async function PublicDropPage({
     id: drop.id,
     slug: drop.slug,
     brandName: drop.brand.profile?.brandName ?? "Maison",
+    logo: drop.brand.profile?.avatarUrl ?? drop.brand.profile?.logoUrl ?? null,
     title: drop.title,
     subtitle: drop.subtitle,
     accent: drop.accent,

@@ -50,19 +50,25 @@ export default function ProfileForm({ defaults }: { defaults: OnboardingDefaults
     updateProfileAction,
     {},
   );
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(defaults.avatarUrl ?? null);
+  // Visuel unique de la maison (logo = photo de profil). Repli sur l'ancien logoUrl.
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(
+    defaults.avatarUrl ?? defaults.logoUrl ?? null,
+  );
 
   return (
     <form action={formAction} className="flex flex-col gap-8">
       <input type="hidden" name="avatarUrl" value={avatarUrl ?? ""} />
 
       <div className="border-b border-line pb-8">
-        <span className={`${labelCls} mb-3 block`}>Photo de profil</span>
+        <span className={`${labelCls} mb-3 block`}>Logo / photo de la maison</span>
         <AvatarUpload
           value={avatarUrl}
           onChange={setAvatarUrl}
           initial={(defaults.brandName?.[0] ?? "?").toUpperCase()}
         />
+        <p className="mt-3 text-xs leading-relaxed text-ink/40">
+          Un seul visuel, utilisé partout : dans votre studio et sur vos pages de drop publiques.
+        </p>
       </div>
 
       <section className="grid grid-cols-1 gap-5 sm:grid-cols-2">
