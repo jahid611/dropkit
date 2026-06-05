@@ -22,7 +22,7 @@ Légende : `[ ]` à faire · `[~]` en cours · `[x]` fait · `→` voir détail
 - [x] **Navigation fluide partout** : session mémoïsée (React `cache()`) + `loading.tsx` sur **tous** les écrans authentifiés (dashboard, éditeur de drop, QR, onboarding, auth) → squelette instantané à chaque navigation ([ADR-0004](./decisions/0004-perf-navigation-dashboard.md))
 - [ ] (optionnel) Réduire encore le cold start des routes DB si besoin
 - [x] Corriger le lien démo cassé (`/d/demo` → 404) : seed d'un drop démo (`npm run seed:demo`, via REST Supabase)
-- [x] **Audit fonts** : les 4 polices servent réellement (aucune retirée). Levier appliqué = périmètre de préchargement — Geist Mono passé en `preload: false` (libellés visiteur uniquement). Home : 4 → 3 polices préchargées. Reste connu : Fraunces préchargée aussi sur la home (réservée au hero visiteur) ; fix propre = module de polices par route (différé, faible gain).
+- [x] **Audit fonts** : 4 → **3 polices**. Geist Mono **supprimée** (ses seuls consommateurs — `LeadForm`, `MusicToggle` — étaient du code mort, supprimés avec la route `/api/leads` et la dépendance `howler`). Restent Geist (corps), Playfair (`.luxe`), Fraunces (hero visiteur), toutes réellement utilisées.
 - [~] Mesure avant/après consignée dans PERFORMANCE.md (après = post-déploiement)
 
 ## Phase 2 — Finition produit (rendre l'app « finie »)  `[~]`

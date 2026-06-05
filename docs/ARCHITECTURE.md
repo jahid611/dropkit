@@ -27,7 +27,6 @@
   /dashboard/drops/[id]/qr    Générateur de QR
   /dashboard/(main)/inscrits  Liste des inscrits
 /api/upload             Upload image -> Supabase Storage
-/api/leads              Capture lead (legacy jsonl ?)
 /api/drops/[id]/export  Export CSV/XLSX des inscrits
 ```
 

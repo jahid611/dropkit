@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Fraunces, Geist, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-// Audit fonts (Phase 1) : les 4 polices servent réellement, aucune n'est retirée.
-// Levier restant = périmètre de préchargement. Déclarées ici (root layout), elles
-// seraient préchargées sur TOUTES les routes (cf. doc next/font « Preloading »).
-// On ne précharge donc que les polices visibles au-dessus de la ligne de flottaison
-// sur les routes les plus exposées ; les autres restent en `preload: false`
-// (toujours chargées et appliquées, mais sans <link rel=preload> sur chaque page).
+// Audit fonts (Phase 1) : 3 polices, toutes réellement utilisées.
+// (Geist Mono a été retirée : ses seuls consommateurs — LeadForm, MusicToggle —
+// étaient du code mort, supprimés en même temps.)
+// Déclarées ici (root layout), elles sont préchargées sur TOUTES les routes
+// (cf. doc next/font « Preloading »).
 
 // Serif éditoriale (display) — titre hero de la page visiteur /d/[slug] (page produit).
 const fraunces = Fraunces({
@@ -30,15 +29,6 @@ const geistSans = Geist({
   display: "swap",
 });
 
-// Mono — uniquement de petits libellés du formulaire visiteur (LeadForm, MusicToggle),
-// jamais un hero → pas de préchargement (évite un <link rel=preload> inutile partout).
-const geistMono = Geist_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  display: "swap",
-  preload: false,
-});
-
 export const metadata: Metadata = {
   title: "DropKit — Studio de drops pour créateurs de mode",
   description:
@@ -53,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${fraunces.variable} ${playfair.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${playfair.variable} ${geistSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink font-sans">
         {children}

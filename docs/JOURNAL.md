@@ -6,33 +6,33 @@
 
 ---
 
-## 2026-06-05 (suite 6) — Audit fonts (Phase 1 close)
+## 2026-06-05 (suite 7) — Phase 2 démarre : nettoyage du code mort (suite de l'audit fonts)
 
-**Demande** : prochaine case de la roadmap → « Audit fonts (4 Google fonts) ».
+**Contexte** : début de la revue UX bout-en-bout (Phase 2). En cartographiant le
+parcours, découverte que **`LeadForm` (capture SMS) et `MusicToggle` (musique
+d'ambiance) ne sont importés nulle part** — code mort depuis le 1er commit. Or
+c'étaient les **seuls** consommateurs de Geist Mono et de la dépendance `howler`.
 
-**Constat** (confirme la note de la suite 3) : les 4 polices servent réellement —
-Geist (corps `<body>`), Playfair (titres `.luxe` : home + dashboard), Fraunces
-(hero de la page visiteur `/d/[slug]`), Geist Mono (libellés du formulaire visiteur :
-`LeadForm`, `MusicToggle`). **Aucune retirée** — en supprimer casserait le design.
+**Décision (utilisateur)** : tout supprimer. Ce qui **clôt mieux l'audit fonts** que
+le `preload: false` de la suite 6 : on ne précharge plus une police inutile, on la retire.
 
-**Levier appliqué** (doc next/font « Preloading » : une police du root layout est
-préchargée sur *toutes* les routes) :
-- **Geist Mono → `preload: false`** : jamais au-dessus de la ligne de flottaison
-  (petits libellés visiteur). La police reste chargée/appliquée, mais sans
-  `<link rel=preload>` sur chaque page.
-- `display: "swap"` rendu explicite sur Geist/Geist Mono (déjà le défaut dans cette
-  version de Next — pour la lisibilité du code).
+**Fait** :
+- Supprimés : `app/components/LeadForm.tsx`, `app/components/MusicToggle.tsx`,
+  `app/api/leads/route.ts` (endpoint « legacy jsonl » noté dans ARCHITECTURE).
+- **Geist Mono retirée** de `layout.tsx` + mapping `--font-mono` de `globals.css`.
+  Police passe de 4 → **3** (Geist, Playfair, Fraunces).
+- Dépendance **`howler` + `@types/howler` désinstallées** (retrait chirurgical de
+  `package.json` + `package-lock.json` pour **ne pas** réécrire les métadonnées `libc`
+  Linux du lockfile — npm macOS les prune, ce qui casserait le build Vercel).
+- `npm run build` ✅ vert ; route `/api/leads` disparue (13 → 12 routes). ARCHITECTURE
+  mise à jour.
 
-**Vérifié** : `npm run build` ✅ vert ; HTML prérendu de la home = **3 polices
-préchargées au lieu de 4** (Mono retiré).
+**À retenir** : `npm install/uninstall` sur ce poste (macOS) prune les entrées `libc`
+du lockfile → toujours éditer `package-lock.json` à la main pour les retraits de deps,
+ou regénérer en CI.
 
-**Trade-off assumé** : Fraunces reste préchargée sur la home alors qu'elle n'y sert
-pas (réservée au hero visiteur) — la retirer globalement provoquerait un swap visible
-sur le headline produit. Fix propre = module de polices préchargées **par route**
-(différé : invasif vs gain marginal, et Phase « fiabilité » prioritaire).
-
-**Prochaine étape** : Phase 1 close. Attaquer **Phase 2** — revue UX bout-en-bout
-(signup → onboarding → drop → QR → inscription → export) puis états vides/erreurs.
+**Prochaine étape** : poursuivre la **revue UX bout-en-bout** — parcours réel
+signup → onboarding → drop → QR → inscription visiteur → export, états vides/erreurs.
 
 ---
 
