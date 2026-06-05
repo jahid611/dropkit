@@ -23,8 +23,13 @@
 **Note** : dashboard authentifié non mesurable au curl (redirige sans session) ;
 vérif côté navigation utilisateur.
 
-**Prochaine étape** : pousser + déployer ; l'utilisateur ressent la navigation. Si LCP
-home reste élevé, instrumenter Lighthouse sur `/` précisément.
+**Étendu** (demande « rends tout fluide ») : `loading.tsx` ajouté sur **tous** les
+écrans authentifiés — éditeur de drop (`drops/[id]`), page QR (`drops/[id]/qr`),
+onboarding, auth (`(auth)`). Chaque navigation a désormais un squelette instantané.
+Build ✅ vert.
+
+**Prochaine étape** : déployé ; tester la fluidité en prod. Si LCP home reste élevé,
+Lighthouse ciblé sur `/`.
 
 ---
 

@@ -19,7 +19,7 @@ Légende : `[ ]` à faire · `[~]` en cours · `[x]` fait · `→` voir détail
 - [x] `next.config.ts` : optimisation d'images, formats AVIF/WebP, cache long
 - [x] Fusionner les requêtes DB de `/d/[slug]` (3 lectures séquentielles → `Promise.all`)
 - [x] **Page de drop `/d/[slug]` cachée (CDN/ISR)** — cold start retiré du chemin critique ([ADR-0003](./decisions/0003-cache-pages-de-drop.md)). État perso via `/api/drops/[id]/me`.
-- [x] **Navigation dashboard accélérée** : session mémoïsée par requête (React `cache()` → 1 requête DB au lieu de 2/navigation) + `loading.tsx` (squelette instantané) ([ADR-0004](./decisions/0004-perf-navigation-dashboard.md))
+- [x] **Navigation fluide partout** : session mémoïsée (React `cache()`) + `loading.tsx` sur **tous** les écrans authentifiés (dashboard, éditeur de drop, QR, onboarding, auth) → squelette instantané à chaque navigation ([ADR-0004](./decisions/0004-perf-navigation-dashboard.md))
 - [ ] (optionnel) Réduire encore le cold start des routes DB si besoin
 - [x] Corriger le lien démo cassé (`/d/demo` → 404) : seed d'un drop démo (`npm run seed:demo`, via REST Supabase)
 - [ ] Audit fonts (4 Google fonts chargées — en garder le strict nécessaire)
