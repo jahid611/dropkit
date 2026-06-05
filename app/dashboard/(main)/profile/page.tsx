@@ -18,6 +18,12 @@ export default async function ProfilePage() {
         <p className="mt-1 text-sm text-ink/50">
           Ces informations personnalisent votre studio et vos pages de drop.
         </p>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/55">
+          Le nom, le logo et la description de votre maison apparaissent sur vos pages de
+          drop publiques — c&apos;est la première impression de vos visiteurs. Les autres
+          informations (réseaux, audience, raison sociale) restent privées et servent à
+          affiner votre studio.
+        </p>
       </div>
       <div className="mt-8">
         <ProfileForm defaults={profile ?? {}} />

@@ -25,7 +25,9 @@ Légende : `[ ]` à faire · `[~]` en cours · `[x]` fait · `→` voir détail
 - [ ] Audit fonts (4 Google fonts chargées — en garder le strict nécessaire)
 - [~] Mesure avant/après consignée dans PERFORMANCE.md (après = post-déploiement)
 
-## Phase 2 — Finition produit (rendre l'app « finie »)  `[ ]`
+## Phase 2 — Finition produit (rendre l'app « finie »)  `[~]`
+- [x] Onboarding : champ « logo URL » remplacé par un **upload** (compression auto) + aides par étape
+- [x] Densité éditoriale : textes explicatifs sur dashboard, inscrits, réglages, profil
 - [ ] Revue UX bout-en-bout : signup → onboarding → créer drop → QR → inscription visiteur → export
 - [ ] États vides, erreurs et chargements soignés partout
 - [ ] Validation robuste des formulaires (marque + visiteur)

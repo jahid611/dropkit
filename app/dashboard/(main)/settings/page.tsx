@@ -12,6 +12,11 @@ export default async function SettingsPage() {
         <p className="mt-1 text-sm text-ink/50">
           Gérez votre connexion et votre compte.
         </p>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink/55">
+          Votre adresse email vous sert à vous connecter et à recevoir les notifications
+          liées à vos drops. Vous pouvez la modifier ou changer votre mot de passe
+          ci-dessous. Par sécurité, tout changement de mot de passe exige l&apos;actuel.
+        </p>
       </div>
       <div className="mt-8">
         <AccountSettings email={brand.email} />

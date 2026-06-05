@@ -54,7 +54,26 @@ export default async function InscritsPage() {
           {totalInscrits} inscrit{totalInscrits > 1 ? "s" : ""} au total ·{" "}
           {stats.length} drop{stats.length > 1 ? "s" : ""}
         </p>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/55">
+          Tous vos contacts capturés, regroupés par drop. Dépliez un drop pour consulter
+          le détail des réponses, exporter votre liste, ou prévenir les inscrits par email
+          à l&apos;ouverture. Une seule inscription par personne et par drop est conservée.
+        </p>
       </div>
+
+      {/* Ce que vous pouvez faire ici — densité + clarté */}
+      <section className="mt-6 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-3">
+        {[
+          { t: "Consulter", d: "Le détail de chaque inscription : date et réponses à tous vos champs." },
+          { t: "Exporter", d: "Téléchargez votre liste en CSV ou Excel pour vos outils marketing." },
+          { t: "Notifier", d: "Envoyez un email à tous les inscrits au moment d'ouvrir le drop." },
+        ].map((s) => (
+          <div key={s.t} className="bg-paper p-5">
+            <h3 className="luxe text-lg text-ink">{s.t}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink/55">{s.d}</p>
+          </div>
+        ))}
+      </section>
 
       <div className="mt-8">
         {stats.length === 0 ? (

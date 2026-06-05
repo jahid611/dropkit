@@ -33,6 +33,33 @@ export default async function DashboardPage() {
         </form>
       </div>
 
+      {/* Comment ça marche — pédagogie + densité, visible en permanence */}
+      <section className="mt-6 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-3">
+        {[
+          {
+            n: "01",
+            t: "Composer",
+            d: "Choisissez un fond, ajoutez vos articles et les champs à demander à vos visiteurs (email, taille, téléphone…).",
+          },
+          {
+            n: "02",
+            t: "Diffuser",
+            d: "Partagez le lien ou le QR code — en boutique, en story, sur vos réseaux. La page publique s'ouvre instantanément.",
+          },
+          {
+            n: "03",
+            t: "Collecter",
+            d: "Chaque visiteur s'inscrit en un geste. Retrouvez vos contacts dans Statistiques et exportez-les quand vous voulez.",
+          },
+        ].map((s) => (
+          <div key={s.n} className="bg-paper p-5">
+            <span className="eyebrow text-ink/35">{s.n}</span>
+            <h3 className="mt-1 luxe text-lg text-ink">{s.t}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink/55">{s.d}</p>
+          </div>
+        ))}
+      </section>
+
       {drops.length === 0 ? (
         <div className="mt-8 border border-dashed border-line p-16 text-center">
           <p className="luxe text-xl text-ink/70">Aucun drop pour l&apos;instant.</p>

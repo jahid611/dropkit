@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-05 (suite 4) — Upload logo onboarding + densité éditoriale (Phase 2)
+
+**Demande** : à l'inscription, remplacer le champ « logo URL » par un upload ; ajouter
+du texte explicatif sur les pages pour densifier.
+
+**Fait**
+- **Onboarding** : champ texte `logoUrl` → composant `AvatarUpload` (compression WebP
+  auto via `/api/upload`, champ caché `logoUrl` pour la soumission). + **aide
+  contextuelle par étape** (STEP_HINTS) expliquant pourquoi on demande chaque info.
+- **Texte explicatif (densité)** :
+  - Dashboard *Mes drops* : bande « Composer / Diffuser / Collecter ».
+  - *Inscrits* : paragraphe + bande « Consulter / Exporter / Notifier ».
+  - *Réglages* : note sécurité (email de connexion, changement de mot de passe).
+  - *Profil* : note « ce qui est public vs privé » sur les pages de drop.
+- `npm run build` ✅ vert.
+
+**Prochaine étape** : poursuivre Phase 2 (revue UX bout-en-bout, états vides/erreurs, SEO/OG).
+
+---
+
 ## 2026-06-05 (suite 3) — Navigation dashboard + LCP
 
 **Signalé** : LCP ~2,88 s et navigation dashboard (inscrits → dashboard) « ultra lente ».

@@ -6,6 +6,7 @@ import {
   completeOnboardingAction,
   type OnboardingState,
 } from "@/app/actions/onboarding";
+import AvatarUpload from "./AvatarUpload";
 
 export interface OnboardingDefaults {
   brandName?: string | null;
@@ -37,6 +38,13 @@ const AUDIENCE = ["< 5k", "5k – 10k", "10k – 50k", "50k – 100k", "> 100k"]
 const FREQUENCY = ["Hebdomadaire", "Mensuel", "Trimestriel", "Ponctuel / Saisonnier"];
 
 const STEPS = ["La maison", "Audience & canaux", "Identité"];
+
+// Texte d'aide affiché sous la barre de progression : explique l'intérêt de chaque étape.
+const STEP_HINTS = [
+  "Les informations essentielles de votre marque. Seul le nom est obligatoire — le reste affine votre studio et n'est jamais affiché sans votre accord.",
+  "Vos réseaux et votre audience nous aident à calibrer vos pages de drop. Tout est facultatif : vous pourrez compléter plus tard depuis votre profil.",
+  "L'identité visuelle de votre maison. Le logo et la description apparaissent sur vos pages de drop publiques — soignez-les, c'est la première impression de vos visiteurs.",
+];
 
 const inputCls =
   "w-full rounded-sm border border-line bg-paper/60 px-4 py-3 text-sm text-ink placeholder:text-ink/30 outline-none transition focus:border-ink/40 focus:bg-paper";
@@ -74,6 +82,7 @@ export default function OnboardingForm({
   );
   const [step, setStep] = useState(0);
   const [brandName, setBrandName] = useState(defaults.brandName ?? "");
+  const [logoUrl, setLogoUrl] = useState<string | null>(defaults.logoUrl ?? null);
 
   const canNext = step !== 0 || brandName.trim().length > 0;
 
@@ -98,6 +107,12 @@ export default function OnboardingForm({
           </div>
         ))}
       </div>
+
+      {/* Champ caché : l'URL du logo uploadé (étape 3) part avec le formulaire. */}
+      <input type="hidden" name="logoUrl" value={logoUrl ?? ""} />
+
+      {/* Aide contextuelle : à quoi sert l'étape courante. */}
+      <p className="mb-7 text-sm leading-relaxed text-ink/55">{STEP_HINTS[step]}</p>
 
       {/* Étape 1 — La maison */}
       <div className={step === 0 ? "flex flex-col gap-4" : "hidden"}>
@@ -209,14 +224,18 @@ export default function OnboardingForm({
 
       {/* Étape 3 — Identité */}
       <div className={step === 2 ? "flex flex-col gap-4" : "hidden"}>
-        <Field label="Logo — URL (l'upload arrive avec l'éditeur de drop)">
-          <input
-            name="logoUrl"
-            defaultValue={defaults.logoUrl ?? ""}
-            placeholder="https://…/logo.png"
-            className={inputCls}
+        <div className="flex flex-col gap-2">
+          <span className="eyebrow text-ink/45">Logo de la maison</span>
+          <AvatarUpload
+            value={logoUrl}
+            onChange={setLogoUrl}
+            initial={(brandName?.[0] ?? "?").toUpperCase()}
           />
-        </Field>
+          <p className="text-xs leading-relaxed text-ink/40">
+            S&apos;affiche sur vos pages de drop et dans votre studio. L&apos;image est
+            redimensionnée et compressée automatiquement — privilégiez un fond neutre.
+          </p>
+        </div>
         <Field label="Pays">
           <input
             name="country"
