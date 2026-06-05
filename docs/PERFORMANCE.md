@@ -1,0 +1,49 @@
+# ⚡ Performance DropKit
+
+> **Mesurer avant d'optimiser.** Toute optimisation est chiffrée ici (avant/après).
+> Outil de mesure rapide : `curl -w "ttfb:%{time_starttransfer}s"`.
+
+## Audit initial — 2026-06-05 (prod `dropkit-five.vercel.app`)
+
+| Route | TTFB à froid | TTFB à chaud | Verdict |
+|---|---|---|---|
+| `/` (statique) | 0,27 s | 0,27 s | ✅ OK |
+| `/d/demo` (DB) | **3,57 s** | 0,69 s | ❌ cold start |
+| `/dashboard` (redir) | — | 0,26 s | ✅ |
+| `/login` | — | 0,20 s | ✅ |
+
+### Causes racines (par impact décroissant)
+
+1. **Cold start serverless + Prisma/Supabase** — 1ʳᵉ visite d'une page DB ≈ 3,5 s
+   pendant l'init de la lambda Vercel + chargement du moteur Prisma + 1ʳᵉ connexion.
+   C'est ce qui « fait lent ». À chaud, c'est correct.
+   - Leviers : vérifier le pooling pgbouncer, réduire les allers-retours DB,
+     alléger l'init, envisager Fluid Compute / keep-warm.
+2. **Images home en `<img>` brut** — hero `IMG_1801.jpeg` = **552 Ko**, carousel 128–272 Ko.
+   Pas de `next/image` ⇒ pas d'AVIF/WebP, pas de resize, pas de lazy-load. Mauvais LCP.
+   - Levier : `next/image` (import statique = width/height/blur auto) + `next.config` images.
+3. **`/d/[slug]` fait 2 requêtes DB séquentielles** (`drop.findUnique` puis
+   `submission.findFirst`) — sur un chemin déjà pénalisé par le cold start.
+   - Levier : fusionner / paralléliser.
+4. **4 Google fonts** chargées (Fraunces, Playfair, Geist, Geist Mono).
+   - Levier : ne garder que celles réellement utilisées au-dessus de la ligne de flottaison.
+
+## Journal des correctifs
+
+> (À remplir au fur et à mesure — chaque ligne = un correctif mesuré.)
+
+| Date | Correctif | Avant | Après |
+|---|---|---|---|
+| 2026-06-05 | Home en `next/image` (hero + carousel) + `next.config` AVIF/WebP | hero JPEG 552 Ko brut | optimisé/resizé en prod (à mesurer Lighthouse post-deploy) |
+| 2026-06-05 | `/d/[slug]` : 3 lectures séquentielles → `Promise.all` | drop + visitor + token en série | 1 aller-retour parallèle |
+
+> **Reste à mesurer après déploiement** (l'optimisation `next/image` n'agit qu'en prod) :
+> LCP de `/` via Lighthouse, et TTFB chaud de `/d/<slug>`.
+
+## Méthode de mesure (reproductible)
+
+```bash
+# TTFB à froid vs à chaud (lancer 2x, le 2e est chaud)
+curl -s -o /dev/null -w "ttfb:%{time_starttransfer}s total:%{time_total}s http:%{http_code}\n" <URL>
+```
+Pour le rendu réel (LCP, CLS) : Lighthouse / PageSpeed Insights sur l'URL prod.
