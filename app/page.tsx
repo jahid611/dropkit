@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Carousel from "./components/Carousel";
 
 const INK = "#1a1611";
@@ -72,11 +73,13 @@ export default function Home() {
         </div>
 
         <div className="relative min-h-[58vh] lg:min-h-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="/home/IMG_1801.jpeg"
             alt="Campagne"
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
           <div className="absolute inset-0 flex items-end p-8">

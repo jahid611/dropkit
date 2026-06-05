@@ -22,19 +22,23 @@ export default async function PublicDropPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const drop = await prisma.drop.findUnique({
-    where: { slug },
-    include: {
-      brand: { include: { profile: true } },
-      items: { orderBy: { position: "asc" } },
-      fields: { orderBy: { position: "asc" } },
-    },
-  });
+
+  // Ces trois lectures sont indépendantes -> en parallèle (un seul aller-retour).
+  const [drop, visitor, token] = await Promise.all([
+    prisma.drop.findUnique({
+      where: { slug },
+      include: {
+        brand: { include: { profile: true } },
+        items: { orderBy: { position: "asc" } },
+        fields: { orderBy: { position: "asc" } },
+      },
+    }),
+    getCurrentVisitor(),
+    readFpToken(),
+  ]);
   if (!drop) notFound();
 
   // Verrouillage : déjà inscrit via empreinte navigateur OU compte visiteur ?
-  const visitor = await getCurrentVisitor();
-  const token = await readFpToken();
   const fp = token ? fingerprint(token) : null;
 
   let alreadySubmitted = false;

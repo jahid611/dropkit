@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export interface Slide {
   img: string;
@@ -25,12 +26,14 @@ export default function Carousel({ slides }: { slides: Slide[] }) {
     <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       <div className="group relative aspect-[16/10] overflow-hidden bg-[#ece6da]">
         {slides.map((s, idx) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             key={idx}
             src={s.img}
             alt={s.title}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+            fill
+            priority={idx === 0}
+            sizes="(max-width: 1152px) 100vw, 1152px"
+            className={`object-cover transition-opacity duration-700 ${
               idx === i ? "opacity-100" : "opacity-0"
             }`}
           />
