@@ -24,7 +24,11 @@
 **Trade-off assumé** : léger flash possible pour un visiteur déjà inscrit (verrou
 toujours garanti serveur à la soumission).
 
-**Prochaine étape** : pousser + déployer, puis mesurer `/d/demo` en prod et consigner.
+**Déployé + mesuré en prod ✅** : `/d/demo` passe de **~3,7 s** à **~65 ms** (CDN HIT),
+soit ≈ 50× plus rapide. `/api/drops/[id]/me` → 200 JSON, contenu servi statiquement. OK.
+
+**Prochaine étape** : Phase 1 quasi close (reste audit fonts, optionnel). On peut passer
+à la **Phase 2 — finition produit** (revue UX bout-en-bout, états vides/erreurs, SEO/OG).
 
 ---
 

@@ -38,7 +38,12 @@
 | 2026-06-05 | `/d/[slug]` : 3 lectures séquentielles → `Promise.all` | drop + visitor + token en série | 1 aller-retour parallèle |
 
 | 2026-06-05 | Seed du drop `/d/demo` (lien vitrine réparé) | 404 | 200 (TTFB 3,7 s froid / 1,4 s chaud) |
-| 2026-06-05 | `/d/[slug]` passée en **statique/ISR** (CDN), état perso via `/me` ([ADR-0003](./decisions/0003-cache-pages-de-drop.md)) | `ƒ` dynamique, cold start ~3,5 s | `○` statique, servie CDN (à confirmer en prod) |
+| 2026-06-05 | `/d/[slug]` passée en **statique/ISR** (CDN), état perso via `/me` ([ADR-0003](./decisions/0003-cache-pages-de-drop.md)) | TTFB **~3,7 s** à froid | TTFB **~65 ms** (CDN HIT) — **≈ 50× plus rapide**, mesuré en prod |
+
+> ✅ **Confirmé en prod le 2026-06-05** : après déploiement, `/d/demo` répond en
+> ~0,06–0,19 s (`x-vercel-cache: HIT`) au lieu de ~3,7 s. Le cold start n'est plus sur
+> le chemin critique de la page la plus exposée (QR / partage). Bout-en-bout validé :
+> contenu servi statiquement + `GET /api/drops/[id]/me` → 200 JSON.
 
 > **Reste à mesurer après déploiement** (l'optimisation `next/image` n'agit qu'en prod) :
 > LCP de `/` via Lighthouse, et TTFB chaud de `/d/<slug>`.
