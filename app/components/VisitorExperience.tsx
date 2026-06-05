@@ -69,6 +69,8 @@ export default function VisitorExperience({
   // Ouvre le modal d'accueil au premier passage (une fois l'état connu, pas si déjà inscrit / déjà vu)
   useEffect(() => {
     if (!checked || submitted) return;
+    // Aperçu dashboard (iframe `#preview`) : on n'auto-ouvre pas la modale d'accueil.
+    if (window.location.hash.includes("preview")) return;
     const seen = localStorage.getItem(`dk_welcome_${drop.slug}`);
     if (!seen) setModalOpen(true);
   }, [checked, submitted, drop.slug]);

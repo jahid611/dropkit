@@ -3,6 +3,7 @@ import { requireOnboardedBrand } from "@/app/lib/guard";
 import { prisma } from "@/app/lib/db";
 import { createDraftDropAction, deleteDropAction } from "@/app/actions/drops";
 import { dropPath } from "@/app/lib/drop-url";
+import DropPreviewModal from "@/app/components/DropPreviewModal";
 
 function statusLabel(starts: Date | null, ends: Date | null) {
   const now = Date.now();
@@ -91,6 +92,7 @@ export default async function DashboardPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
+                  <DropPreviewModal path={dropPath(brandName, d.slug)} title={d.title} />
                   <Link
                     href={dropPath(brandName, d.slug)}
                     target="_blank"

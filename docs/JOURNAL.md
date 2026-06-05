@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-06 (suite 2) — Aperçu d'un drop en modale depuis le dashboard
+
+**Demande (utilisateur)** : sur « Mes drops », un bouton « œil » à côté de « Voir » →
+modale d'aperçu du drop, animations d'ouverture/fermeture soignées + croix.
+
+**Fait** : `app/components/DropPreviewModal.tsx` (client) :
+- Bouton œil (SVG inline) inséré avant « Voir ↗ » dans la liste des drops.
+- Modale = **iframe de la vraie page publique** (`dropPath` + ancre `#preview`) dans un
+  **cadre téléphone** → aperçu 100 % fidèle, sans dupliquer le rendu ni recharger de data.
+- **framer-motion** (déjà installé, plus utilisé depuis la suppression de LeadForm) :
+  fond en fade, panneau en spring (scale/opacity/y) à l'ouverture, exit inversé via
+  `AnimatePresence`. Croix qui pivote au survol.
+- Échap pour fermer, clic sur le fond, **verrouillage du scroll** pendant l'ouverture.
+- `VisitorExperience` : n'auto-ouvre plus sa modale d'accueil si `location.hash`
+  contient `preview` (check client-only → **page reste statique**, pas de deopt).
+
+**Vérifié** : `npm run build` ✅. **Non testable en local** (dashboard + iframe = DB,
+ports PG bloqués) → valider le rendu/les animations en prod.
+
+---
+
 ## 2026-06-06 (suite) — Nom de la maison dans l'URL : /d/<maison>/<drop>
 
 **Demande (utilisateur)** : faire apparaître le nom de la maison dans l'URL, en plus
