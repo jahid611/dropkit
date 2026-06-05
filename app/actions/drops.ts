@@ -129,6 +129,7 @@ export async function saveDropAction(
 
   revalidatePath("/dashboard");
   revalidatePath(`/dashboard/drops/${dropId}`);
+  revalidatePath(`/d/${drop.slug}`); // rafraîchit la page publique cachée
   return { ok: true, slug: drop.slug };
 }
 

@@ -1,11 +1,17 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/db";
 import { getBackground } from "@/app/lib/backgrounds";
-import { readFpToken, fingerprint } from "@/app/lib/fingerprint";
-import { getCurrentVisitor } from "@/app/lib/visitor-auth";
 import VisitorExperience, {
   type VisitorDrop,
 } from "@/app/components/VisitorExperience";
+
+// Page publique mise en cache (CDN) : son contenu est identique pour tous.
+// -> servie sans lambda au 1er rendu = plus de cold start sur le chemin critique.
+// La personnalisation (« déjà inscrit ? ») est récupérée côté client via
+// /api/drops/[id]/me. Revalidation instantanée à l'édition : revalidatePath
+// dans saveDropAction ; backstop horaire ci-dessous par sécurité.
+export const dynamic = "force-static";
+export const revalidate = 3600;
 
 function parseOptions(raw: string): string[] {
   try {
@@ -22,38 +28,15 @@ export default async function PublicDropPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
-  // Ces trois lectures sont indépendantes -> en parallèle (un seul aller-retour).
-  const [drop, visitor, token] = await Promise.all([
-    prisma.drop.findUnique({
-      where: { slug },
-      include: {
-        brand: { include: { profile: true } },
-        items: { orderBy: { position: "asc" } },
-        fields: { orderBy: { position: "asc" } },
-      },
-    }),
-    getCurrentVisitor(),
-    readFpToken(),
-  ]);
+  const drop = await prisma.drop.findUnique({
+    where: { slug },
+    include: {
+      brand: { include: { profile: true } },
+      items: { orderBy: { position: "asc" } },
+      fields: { orderBy: { position: "asc" } },
+    },
+  });
   if (!drop) notFound();
-
-  // Verrouillage : déjà inscrit via empreinte navigateur OU compte visiteur ?
-  const fp = token ? fingerprint(token) : null;
-
-  let alreadySubmitted = false;
-  if (fp || visitor) {
-    const existing = await prisma.submission.findFirst({
-      where: {
-        dropId: drop.id,
-        OR: [
-          ...(fp ? [{ fingerprint: fp }] : []),
-          ...(visitor ? [{ visitorId: visitor.id }] : []),
-        ],
-      },
-    });
-    alreadySubmitted = Boolean(existing);
-  }
 
   const dark = Boolean(getBackground(drop.backgroundId)?.dark);
   let cd = { show: true, style: "boxed" };
@@ -82,16 +65,9 @@ export default async function PublicDropPage({
       options: parseOptions(f.options),
       role: f.role,
     })),
-    ended: Boolean(drop.endsAt && drop.endsAt.getTime() < Date.now()),
+    // Timestamp de fin : « terminé ? » est calculé côté client (le HTML est caché).
+    endsAt: drop.endsAt ? drop.endsAt.getTime() : null,
   };
 
-  return (
-    <VisitorExperience
-      drop={vd}
-      dark={dark}
-      alreadySubmitted={alreadySubmitted}
-      loggedIn={Boolean(visitor)}
-      visitorEmail={visitor?.email ?? null}
-    />
-  );
+  return <VisitorExperience drop={vd} dark={dark} />;
 }

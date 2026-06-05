@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-06-05 (suite 2) — Cold start : pages de drop cachées (CDN/ISR)
+
+**Fait** ([ADR-0003](./decisions/0003-cache-pages-de-drop.md))
+- `/d/[slug]` refactorée : retrait des lectures de cookies → **`force-static` + ISR**.
+  Build confirme : la route passe de `ƒ` (dynamique) à **`○` (statique)**, servie CDN.
+- Nouvel endpoint `GET /api/drops/[id]/me` (dynamique, léger) : renvoie
+  `{ alreadySubmitted, loggedIn, visitorEmail }` ; appelé côté client après l'affichage.
+- `VisitorExperience` : récupère l'état perso via `/me`, n'ouvre le modal qu'une fois
+  l'état connu (pas de flash), `ended` calculé côté client depuis `endsAt`.
+- `saveDropAction` : `revalidatePath('/d/<slug>')` → rafraîchissement instantané à l'édition.
+- `npm run build` ✅ vert.
+
+**Effet attendu** : cold start retiré du 1er rendu de la page la plus exposée (QR/partage).
+À confirmer en prod après déploiement (TTFB froid de `/d/demo` devrait chuter).
+
+**Trade-off assumé** : léger flash possible pour un visiteur déjà inscrit (verrou
+toujours garanti serveur à la soumission).
+
+**Prochaine étape** : pousser + déployer, puis mesurer `/d/demo` en prod et consigner.
+
+---
+
 ## 2026-06-05 (suite) — Déploiement confirmé + réparation de la démo
 
 **Fait**

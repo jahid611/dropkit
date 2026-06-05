@@ -19,38 +19,58 @@ export interface VisitorDrop {
   countdown: { show: boolean; style: string };
   items: { title: string; imageUrl: string | null }[];
   fields: VisitorField[];
-  ended: boolean;
+  endsAt: number | null;
 }
 
 export default function VisitorExperience({
   drop,
   dark,
-  alreadySubmitted,
-  loggedIn: initialLoggedIn,
-  visitorEmail,
 }: {
   drop: VisitorDrop;
   dark: boolean;
-  alreadySubmitted: boolean;
-  loggedIn: boolean;
-  visitorEmail: string | null;
 }) {
-  const [submitted, setSubmitted] = useState(alreadySubmitted);
+  const [submitted, setSubmitted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [view, setView] = useState<"choices" | "signup" | "login">("choices");
-  const [loggedIn, setLoggedIn] = useState(initialLoggedIn);
-  const [email, setEmail] = useState(visitorEmail);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  // L'état perso (inscrit ? connecté ?) arrive après coup via /me : on attend
+  // de le connaître avant d'ouvrir le modal d'accueil, pour éviter tout flash.
+  const [checked, setChecked] = useState(false);
 
   const ink = dark ? "text-paper" : "text-ink";
   const inkSoft = dark ? "text-paper/60" : "text-ink/55";
   const withImages = drop.items.filter((i) => i.imageUrl);
+  const ended = drop.endsAt !== null && Date.now() >= drop.endsAt;
 
-  // Ouvre le modal d'accueil au premier passage (sauf si déjà inscrit / déjà vu)
+  // Récupère l'état personnel du visiteur (la page elle-même est cachée côté CDN).
   useEffect(() => {
-    if (submitted) return;
+    let active = true;
+    fetch(`/api/drops/${drop.id}/me`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => {
+        if (!active) return;
+        if (s) {
+          setSubmitted(Boolean(s.alreadySubmitted));
+          setLoggedIn(Boolean(s.loggedIn));
+          if (s.visitorEmail) setEmail(s.visitorEmail);
+        }
+        setChecked(true);
+      })
+      .catch(() => {
+        if (active) setChecked(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [drop.id]);
+
+  // Ouvre le modal d'accueil au premier passage (une fois l'état connu, pas si déjà inscrit / déjà vu)
+  useEffect(() => {
+    if (!checked || submitted) return;
     const seen = localStorage.getItem(`dk_welcome_${drop.slug}`);
     if (!seen) setModalOpen(true);
-  }, [submitted, drop.slug]);
+  }, [checked, submitted, drop.slug]);
 
   function closeWelcome() {
     localStorage.setItem(`dk_welcome_${drop.slug}`, "1");
@@ -94,7 +114,7 @@ export default function VisitorExperience({
         <div className="mt-10 w-full max-w-sm">
           {submitted ? (
             <LockedCard dark={dark} />
-          ) : drop.ended ? (
+          ) : ended ? (
             <p className={`font-serif text-xl font-light italic ${ink}`}>
               Ce drop est terminé.
             </p>
