@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-06-05 (suite 8) — SEO + OpenGraph de la page de drop (Phase 2)
+
+**Demande** : case Phase 2 « SEO de base + OpenGraph (partage de la page de drop) ».
+Constat de la revue : `/d/[slug]` n'avait aucune métadonnée → un lien partagé
+(QR / réseaux / SMS) affichait le titre générique du site, sans aperçu visuel.
+
+**Fait** (doc lue : `node_modules/next/dist/docs/.../14-metadata-and-og-images.md`
++ référence `generate-metadata`) :
+- **`generateMetadata`** sur `/d/[slug]/page.tsx` : titre `Drop — Maison` (`title.absolute`
+  → pas de « · DropKit » sur la page de marque), description (subtitle → welcomeText →
+  fallback), **OpenGraph + Twitter card**, image = 1er article illustré sinon logo
+  (URL absolue Supabase, gardée par regex `^https?://`), `alternates.canonical`.
+- **`app/lib/site.ts`** : `siteUrl()` (NEXT_PUBLIC_SITE_URL → VERCEL_PROJECT_PRODUCTION_URL
+  → VERCEL_URL → localhost). Sert `metadataBase`.
+- **Root layout** : `metadataBase`, gabarit de titre `%s · DropKit`, OG par défaut
+  (siteName/type/locale fr_FR).
+- **`app/lib/public-drop.ts`** : `getPublicDrop` mémoïsé via `cache()` React →
+  `generateMetadata` + la page partagent **une seule** requête DB (page = `force-static`).
+- `.env.example` : `NEXT_PUBLIC_SITE_URL` documentée (optionnelle).
+
+**Vérifié** : `npm run build` ✅ vert ; `/d/[slug]` reste statique. Balises OG racines
+confirmées sur la home en local. **La page de drop n'est pas testable en local** (ports
+PG bloqués) → vérifier en prod avec un vrai slug (ex. `/d/demo`) via un validateur OG.
+
+**Aussi** : case « Revue UX bout-en-bout » cochée (parcours sain, reliquats reportés sur
+leurs propres cases : `error.tsx`, modale sur drop terminé, CTA configurable).
+
+**Prochaine étape** : reliquats Phase 2 — états vides/erreurs (`error.tsx`), validation,
+emails Resend, responsive, page démo vitrine.
+
+---
+
 ## 2026-06-05 (suite 7) — Phase 2 démarre : nettoyage du code mort (suite de l'audit fonts)
 
 **Contexte** : début de la revue UX bout-en-bout (Phase 2). En cartographiant le

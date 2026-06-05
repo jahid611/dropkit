@@ -1,6 +1,7 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { prisma } from "@/app/lib/db";
 import { getBackground } from "@/app/lib/backgrounds";
+import { getPublicDrop } from "@/app/lib/public-drop";
 import VisitorExperience, {
   type VisitorDrop,
 } from "@/app/components/VisitorExperience";
@@ -22,20 +23,63 @@ function parseOptions(raw: string): string[] {
   }
 }
 
+// SEO / partage : titre, description et image OpenGraph dérivés du drop.
+// C'est la page diffusée par QR / réseaux / SMS → l'aperçu doit être soigné.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const drop = await getPublicDrop(slug);
+  if (!drop) return { title: "Drop introuvable" };
+
+  const brandName = drop.brand.profile?.brandName ?? "Maison";
+  const title = `${drop.title} — ${brandName}`;
+  const description =
+    drop.subtitle?.trim() ||
+    drop.welcomeText?.trim() ||
+    `Inscrivez-vous pour un accès prioritaire au drop « ${drop.title} » de ${brandName}.`;
+
+  // Image de partage : 1er article illustré, sinon le logo de la maison.
+  // Doit être une URL absolue (les images Supabase Storage le sont).
+  const candidate =
+    drop.items.find((it) => it.imageUrl)?.imageUrl ??
+    drop.brand.profile?.avatarUrl ??
+    drop.brand.profile?.logoUrl ??
+    null;
+  const image = candidate && /^https?:\/\//.test(candidate) ? candidate : null;
+  const url = `/d/${drop.slug}`;
+
+  return {
+    // `absolute` : la page de drop porte l'identité de la marque, pas « · DropKit ».
+    title: { absolute: title },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url,
+      siteName: brandName,
+      ...(image ? { images: [{ url: image, alt: title }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
+}
+
 export default async function PublicDropPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const drop = await prisma.drop.findUnique({
-    where: { slug },
-    include: {
-      brand: { include: { profile: true } },
-      items: { orderBy: { position: "asc" } },
-      fields: { orderBy: { position: "asc" } },
-    },
-  });
+  const drop = await getPublicDrop(slug);
   if (!drop) notFound();
 
   const dark = Boolean(getBackground(drop.backgroundId)?.dark);

@@ -53,6 +53,9 @@ Champs « JSON » stockés en `String` sérialisé (portabilité). Schéma compl
 - **Prisma en singleton** (`app/lib/db.ts`) pour éviter N connexions en dev.
 - **Garde d'accès** : `requireBrand()` / `requireOnboardedBrand()` en tête des pages dashboard.
 - **Verrouillage 1 inscription / drop** via `@@unique([dropId, fingerprint])`.
+- **SEO / partage** : `generateMetadata` sur `/d/[slug]` (OpenGraph + Twitter, image =
+  1er article ou logo, canonical). URL de base via `app/lib/site.ts` (`siteUrl()` →
+  `metadataBase`). Lecture du drop mutualisée par `app/lib/public-drop.ts` (`cache()`).
 - Commentaires et libellés produit en **français**.
 
 ## Frontières & dépendances externes

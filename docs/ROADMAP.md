@@ -28,12 +28,12 @@ Légende : `[ ]` à faire · `[~]` en cours · `[x]` fait · `→` voir détail
 ## Phase 2 — Finition produit (rendre l'app « finie »)  `[~]`
 - [x] Onboarding : champ « logo URL » remplacé par un **upload** (compression auto) + aides par étape
 - [x] Densité éditoriale : textes explicatifs sur dashboard, inscrits, réglages, profil
-- [ ] Revue UX bout-en-bout : signup → onboarding → créer drop → QR → inscription visiteur → export
-- [ ] États vides, erreurs et chargements soignés partout
+- [x] Revue UX bout-en-bout : signup → onboarding → créer drop → QR → inscription visiteur → export. Parcours cohérent, aucun lien cassé ; formulaires (loading/erreur/champ requis/verrou) corrects. Nettoyage du code mort du parcours (LeadForm, MusicToggle, `/api/leads`). Reliquats notés ci-dessous.
+- [ ] États vides, erreurs et chargements soignés partout — _reliquat revue : pas d'`error.tsx` global ; modale d'accueil visible même sur drop terminé_
 - [ ] Validation robuste des formulaires (marque + visiteur)
 - [ ] Emails transactionnels propres (Resend) : confirmation, fin de drop
 - [ ] Responsive mobile vérifié sur les parcours clés
-- [ ] SEO de base + OpenGraph (partage de la page de drop)
+- [x] **SEO de base + OpenGraph** (partage de la page de drop) : `generateMetadata` sur `/d/[slug]` (titre/description dynamiques, OG + Twitter card, image = 1er article ou logo, canonical) + `metadataBase`/OG par défaut au root. Requête DB mutualisée via `cache()`. _À vérifier en prod avec un vrai slug._
 - [ ] Page démo publique réellement vitrine
 
 ## Phase 3 — Confiance & robustesse (pré-requis pour facturer)  `[ ]`

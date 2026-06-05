@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Geist, Playfair_Display } from "next/font/google";
+import { siteUrl } from "@/app/lib/site";
 import "./globals.css";
 
 // Audit fonts (Phase 1) : 3 polices, toutes réellement utilisées.
@@ -30,9 +31,18 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "DropKit — Studio de drops pour créateurs de mode",
+  metadataBase: new URL(siteUrl()),
+  title: {
+    default: "DropKit — Studio de drops pour créateurs de mode",
+    template: "%s · DropKit",
+  },
   description:
     "Composez en quelques minutes une page de drop éditoriale et capturez vos contacts avant l'ouverture.",
+  openGraph: {
+    type: "website",
+    siteName: "DropKit",
+    locale: "fr_FR",
+  },
 };
 
 export default function RootLayout({
